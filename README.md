@@ -77,24 +77,24 @@ import AmazonLocationiOSTrackingSDK
 
 Create AuthHelper and use it with the AWS SDK:
 
-```
+``` swift
 // Create an authentication helper using credentials from Cognito
 let authHelper = AuthHelper()
 let locationCredentialsProvider = authHelper.authenticateWithCognitoUserPool(identityPoolId: "My-Cognito-Identity-Pool-Id", region: "My-region") //example: us-east-1
 let locationTracker = LocationTracker(provider: locationCredentialsProvider, trackerName: "My-tracker-name")
 
 // Optionally you can set ClientConfig with your own values in either initialize or in a separate function
-// let trackerConfig = LocationTrackerConfig(locationFilters: [TimeLocationFilter(), DistanceLocationFilter()],
+let trackerConfig = LocationTrackerConfig(locationFilters: [TimeLocationFilter(), DistanceLocationFilter()],
             trackingDistanceInterval: 30,
             trackingTimeInterval: 30,
             logLevel: .debug)
-// locationTracker = LocationTracker(provider: credentialsProvider, trackerName: "My-tracker-name",config: trackerConfig)
-// locationTracker.setConfig(config: trackerConfig)
+locationTracker = LocationTracker(provider: credentialsProvider, trackerName: "My-tracker-name",config: trackerConfig)
+locationTracker.setConfig(config: trackerConfig)
 ```
 
 You can use the location client to make calls to Amazon Location Service. Here are a few simple examples for tracking operations:
 
-```
+``` swift
 // Required in info.plist: Privacy - Location When In Use Usage Description
 do { 
     try locationTracker.startTracking()
