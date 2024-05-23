@@ -5,6 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "AmazonLocationiOSTrackingSDK",
+    platforms: [.iOS(.v13)],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
@@ -13,7 +14,7 @@ let package = Package(
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
-        .package(url: "https://github.com/aws-geospatial/amazon-location-mobile-auth-sdk-ios.git", branch: "main"),
+        .package(url: "https://github.com/makeen-project/amazon-location-mobile-auth-sdk-ios.git", branch: "ALMS-134_AmazonHttpClient"),
         .package(url: "https://github.com/aws-amplify/aws-sdk-ios-spm.git", .upToNextMajor(from: "2.0.0"))
     ],
     targets: [
