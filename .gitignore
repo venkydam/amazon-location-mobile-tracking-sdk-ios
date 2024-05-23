@@ -1,3 +1,6 @@
 .DS_Store
 *.xcworkspacedata
 Tests/AWSTrackingSDKiOSTests/TestConfig.plist
+.swiftpm/xcode/package.xcworkspace/xcuserdata/zeeshansheikh.xcuserdatad/UserInterfaceState.xcuserstate
+.swiftpm/xcode/xcuserdata/zeeshansheikh.xcuserdatad/xcdebugger/Breakpoints_v2.xcbkptlist
+.swiftpm/xcode/xcuserdata/zeeshansheikh.xcuserdatad/xcschemes/xcschememanagement.plist
