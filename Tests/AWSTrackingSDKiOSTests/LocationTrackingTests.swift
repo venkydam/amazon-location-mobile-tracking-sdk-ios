@@ -375,16 +375,13 @@ final class LocationTrackingTests: XCTestCase {
     }
     
     private func getCurrentDate() -> String {
-        // Get the current date and time
         let currentDate = Date()
 
-        // Create a date formatter
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'"
-        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0) // Ensure UTC time zone
-        dateFormatter.locale = Locale(identifier: "en_US_POSIX") // Ensure fixed date format
+        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
 
-        // Format the date to the desired string
         let formattedDateString = dateFormatter.string(from: currentDate)
 
         return formattedDateString

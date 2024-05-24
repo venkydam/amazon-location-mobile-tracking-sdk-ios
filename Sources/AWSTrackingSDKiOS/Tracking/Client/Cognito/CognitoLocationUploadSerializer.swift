@@ -1,125 +1,39 @@
 import Foundation
 import AmazonLocationiOSAuthSDK
 import CoreLocation
-import AWSLocationXCF
-import AWSMobileClientXCF
 
 internal class CognitoLocationUploadSerializer: LocationUploadSerializer {
-    typealias UpdateLocationResponseType = AWSLocationBatchUpdateDevicePositionResponse
-    typealias GetLocationResponseType = GetLocationResponse
-    
     private var deviceId: String
     private var trackerName: String
-    private var client: AWSLocation
+    private var client: AmazonLocationClient
     
-    init(client: AWSLocation, deviceId: String, trackerName: String) {
+    init(client: AmazonLocationClient, deviceId: String, trackerName: String) {
         self.deviceId = deviceId
         self.trackerName = trackerName
         self.client = client
     }
     
-    func updateDeviceLocation(locations: [LocationEntity], completion: @escaping  (Result<UpdateLocationResponseType, Error>) -> Void) {
+    func updateDeviceLocation(locations: [LocationEntity]) async throws -> EmptyResponse {
         
-        let request = AWSLocationBatchUpdateDevicePositionRequest()!
-        request.trackerName = trackerName
-        var positions: [AWSLocationDevicePositionUpdate] = []
+        var positions: [Update] = []
         
         for location in locations {
-            let positionUpdate = AWSLocationDevicePositionUpdate()!
-            positionUpdate.deviceId = deviceId
-            positionUpdate.position = [NSNumber(value: location.longitude), NSNumber(value: location.latitude)]
-            positionUpdate.sampleTime = Date()
-            
+            let positionUpdate = Update(positionAccuracy: .init(horizontal: location.accuracy), deviceId: deviceId, position: [location.longitude, location.latitude], positionProperties: [:], sampleTime: Utils.jsonDateToString(date: Date()))
             positions.append(positionUpdate)
         }
-        
-        // Add the position updates to the request
-        request.updates = positions
-        
-        let result = client.batchUpdateDevicePosition(request)
-        
-        result.continueWith { response in
-            if let taskResult = response.result {
-                completion(.success(taskResult))
-            } else {
-                let defaultError = NSError(domain: "Tracking", code: -1)
-                let error = response.error ?? defaultError
-                print("error \(error)")
-                completion(.failure(error))
-            }
 
-            return nil
-        }
-    }
-
-    func getDeviceLocation(nextToken: String? = nil, startTime: Date? = nil, endTime: Date? = nil, completion: @escaping  (Result<GetLocationResponseType, Error>) -> Void) {
-        let request = AWSLocationGetDevicePositionHistoryRequest()!
-        request.trackerName = trackerName
-        request.deviceId = deviceId
-        if nextToken != nil {
-            request.nextToken = nextToken
-        }
-        if startTime != nil {
-            request.startTimeInclusive = startTime
-        }
-        if endTime != nil {
-            request.endTimeExclusive = endTime
-        }
+        let request = BatchUpdateDevicePositionRequest(updates: positions)
+        let result = try await client.batchUpdateDevicePosition(trackerName: trackerName, request: request)
         
-        let result = client.getDevicePositionHistory(request)
-        
-        result.continueWith { response in
-            if let taskResult = response.result {
-                let getLocationReponse = GetLocationResponse(awsResponse: taskResult)
-                completion(.success(getLocationReponse))
-            } else {
-                let defaultError = NSError(domain: "Tracking", code: -1)
-                let error = response.error ?? defaultError
-                print("error \(error)")
-                completion(.failure(error))
-            }
-            
-            return nil
-        }
+        return result
     }
     
-    func removeAllHistory(completion: @escaping  (Result<Void, Error>) -> Void) {
-        let request = AWSLocationBatchDeleteDevicePositionHistoryRequest()!
-        request.trackerName = trackerName
-        request.deviceIds = [deviceId]
+    func getDeviceLocation(nextToken: String? = nil, startTime: Date? = nil, endTime: Date? = nil, maxResults: Int? = nil) async throws -> GetDevicePositionHistoryResponse {
+        let startTimeInclusive = startTime != nil ? Utils.jsonDateToString(date: startTime!) : nil
+        let endTimeInclusive = endTime != nil ? Utils.jsonDateToString(date: endTime!) : nil
+        let request = GetDevicePositionHistoryRequest(startTimeInclusive: startTimeInclusive, endTimeExclusive: endTimeInclusive, maxResults: maxResults, nextToken: nextToken)
         
-        let result = client.batchDeleteDevicePositionHistory(request)
-        
-        result.continueWith { response in
-            if response.result != nil {
-                completion(.success(()))
-            } else {
-                let defaultError = NSError(domain: "Tracking", code: -1)
-                let error = response.error ?? defaultError
-                print("error \(error)")
-                completion(.failure(error))
-            }
-            return nil
-        }
-    }
-}
-
-extension GetLocationResponse {
-    init(awsResponse: AWSLocationGetDevicePositionHistoryResponse) {
-        let devicePositions = awsResponse.devicePositions?.map { awsDevicePosition in
-            return DevicePosition(
-                accuracy:  awsDevicePosition.accuracy != nil ? Accuracy(horizontal: awsDevicePosition.accuracy?.horizontal as? Double) : nil,
-                deviceId: awsDevicePosition.deviceId,
-                position: Position(latitude: awsDevicePosition.position?.last?.doubleValue, longitude: awsDevicePosition.position?.first?.doubleValue),
-                positionProperties: awsDevicePosition.positionProperties ?? [:],
-                receivedTime: awsDevicePosition.receivedTime,
-                sampleTime: awsDevicePosition.sampleTime
-            )
-        }
-        
-        self.init(
-            devicePositions: devicePositions,
-            nextToken: awsResponse.nextToken
-        )
+        let result = try await client.getDevicePositionHistory(trackerName: trackerName, deviceId: deviceId, request: request)
+        return result
     }
 }

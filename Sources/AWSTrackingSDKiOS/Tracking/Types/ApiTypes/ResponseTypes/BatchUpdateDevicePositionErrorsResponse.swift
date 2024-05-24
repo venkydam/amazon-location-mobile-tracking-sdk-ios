@@ -1,7 +1,7 @@
 import Foundation
 import AmazonLocationiOSAuthSDK
 
-public struct BatchUpdateDevicePositionErrorsResponse: AmazonErrorResponse, Error {
+public struct BatchUpdateDevicePositionErrorsResponse: AmazonBaseErrorResponse, Error {
     public let errors: [ErrorDetail]
     
     enum CodingKeys: String, CodingKey {

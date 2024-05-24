@@ -1,4 +1,5 @@
 import Foundation
+import AmazonLocationiOSAuthSDK
 
 public struct GetLocationResponse: Decodable {
     public let devicePositions: [DevicePosition]?
@@ -24,11 +25,7 @@ public struct Position: Decodable {
 }
 
 protocol LocationUploadSerializer {
- 
-    associatedtype UpdateLocationResponseType
-    associatedtype GetLocationResponseType
+    func updateDeviceLocation(locations: [LocationEntity]) async throws -> EmptyResponse
     
-    func updateDeviceLocation(locations: [LocationEntity], completion: @escaping  (Result<UpdateLocationResponseType, Error>) -> Void)
-    
-    func getDeviceLocation(nextToken: String?, startTime: Date?, endTime: Date?, completion: @escaping  (Result<GetLocationResponseType, Error>) -> Void)
+    func getDeviceLocation(nextToken: String?, startTime: Date?, endTime: Date?, maxResults: Int?) async throws -> GetDevicePositionHistoryResponse
 }

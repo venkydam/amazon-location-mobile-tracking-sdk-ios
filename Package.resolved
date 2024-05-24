@@ -6,16 +6,7 @@
       "location" : "https://github.com/makeen-project/amazon-location-mobile-auth-sdk-ios.git",
       "state" : {
         "branch" : "ALMS-134_AmazonHttpClient",
-        "revision" : "0a6d8418cbb03e10804555157629fe8a4bfc4c31"
-      }
-    },
-    {
-      "identity" : "aws-sdk-ios-spm",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/aws-amplify/aws-sdk-ios-spm.git",
-      "state" : {
-        "revision" : "3588f2d300e4a5cbeee09d37d795db94e6158112",
-        "version" : "2.36.2"
+        "revision" : "849d1255a9bff9ddd5c56cd68b133a7570d0346f"
       }
     },
     {
