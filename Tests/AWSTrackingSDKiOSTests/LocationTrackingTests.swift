@@ -271,7 +271,6 @@ final class LocationTrackingTests: XCTestCase {
     func testGetTrackingLocations() async throws {
         let config = readTestConfig()
         let identityPoolId = config["identityPoolID"]!
-        //let deviceID = config["deviceID"]!
         let trackerName = config["trackerName"]!
         let cognitoProvider = try await AuthHelper().authenticateWithCognitoIdentityPool(identityPoolId: identityPoolId)
         let tracker = LocationTracker(provider: cognitoProvider!, trackerName: trackerName)
