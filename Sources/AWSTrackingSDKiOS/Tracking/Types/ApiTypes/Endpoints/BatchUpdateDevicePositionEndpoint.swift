@@ -11,6 +11,6 @@ public struct BatchUpdateDevicePositionEndpoint: AmazonLocationEndpoint {
     }
     
     public func url() -> String {
-        return "https://tracker.geo.\(region).amazonaws.com/\(trackerName)"
+        return "https://tracking.geo.\(region).amazonaws.com/tracking/v0/trackers/\(trackerName)/positions"
     }
 }

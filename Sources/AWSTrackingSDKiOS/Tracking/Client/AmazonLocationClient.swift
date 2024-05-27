@@ -27,7 +27,7 @@ public extension AmazonLocationClient {
         
         let result: Result<GetDevicePositionHistoryResponse, AmazonErrorResponse> = try await sendRequest(
             serviceName: .Location,
-            endpoint: GetDevicePositionHistoryEndpoint(region: locationProvider.getRegion()!, trackerName: trackerName),
+            endpoint: GetDevicePositionHistoryEndpoint(region: locationProvider.getRegion()!, trackerName: trackerName, deviceId: deviceId),
             httpMethod: .POST,
             requestBody: request,
             successType: GetDevicePositionHistoryResponse.self,

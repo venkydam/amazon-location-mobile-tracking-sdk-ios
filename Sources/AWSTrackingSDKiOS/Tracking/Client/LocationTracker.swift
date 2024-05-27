@@ -138,9 +138,9 @@ public class LocationTracker {
         isTrackingActive = false
     }
     
-    public func getTrackerDeviceLocation(nextToken: String?, startTime: Date? = nil, endTime: Date? = nil) async throws -> GetDevicePositionHistoryResponse? {
+    public func getTrackerDeviceLocation(nextToken: String?, startTime: Date? = nil, endTime: Date? = nil, maxResults: Int? = nil) async throws -> GetDevicePositionHistoryResponse? {
         if cognitoLocationUploadSerializer != nil {
-           return try await getTrackerDeviceLocations(with: cognitoLocationUploadSerializer!, nextToken: nil)
+           return try await getTrackerDeviceLocations(with: cognitoLocationUploadSerializer!, nextToken: nil, startTime: startTime, endTime: endTime, maxResults: maxResults)
         }
         return nil
     }
@@ -201,8 +201,8 @@ public class LocationTracker {
         }
     }
 
-    private func getTrackerDeviceLocations<S: LocationUploadSerializer>(with serializer: S, nextToken: String?, startTime: Date? = nil, endTime: Date? = nil)  async throws -> GetDevicePositionHistoryResponse {
-        return try await serializer.getDeviceLocation(nextToken: nextToken, startTime: startTime, endTime: endTime, maxResults: nil)
+    private func getTrackerDeviceLocations<S: LocationUploadSerializer>(with serializer: S, nextToken: String?, startTime: Date? = nil, endTime: Date? = nil, maxResults: Int? = nil)  async throws -> GetDevicePositionHistoryResponse {
+        return try await serializer.getDeviceLocation(nextToken: nextToken, startTime: startTime, endTime: endTime, maxResults: maxResults)
     }
     
     private func filterLocations(locations: [LocationEntity]) -> [LocationEntity] {

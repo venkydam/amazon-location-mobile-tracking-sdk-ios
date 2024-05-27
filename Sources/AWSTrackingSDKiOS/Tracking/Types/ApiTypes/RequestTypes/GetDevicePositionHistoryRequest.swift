@@ -17,7 +17,6 @@ public struct GetDevicePositionHistoryRequest: Codable, EncodableRequest {
     public func toData() throws -> Data {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
-        encoder.keyEncodingStrategy = .convertToSnakeCase
         return try encoder.encode(self)
     }
 }

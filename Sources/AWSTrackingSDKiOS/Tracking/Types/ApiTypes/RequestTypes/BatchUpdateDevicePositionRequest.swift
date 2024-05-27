@@ -18,7 +18,7 @@ public struct Update: Codable {
     public let positionAccuracy: PositionAccuracy
     public let deviceId: String
     public let position: [Double]
-    public let positionProperties: [String: String]
+    public let positionProperties: [String: String]?
     public let sampleTime: String
     
     enum CodingKeys: String, CodingKey {
