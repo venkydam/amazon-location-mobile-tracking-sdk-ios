@@ -15,4 +15,8 @@ public struct GetDevicePositionHistoryEndpoint: AmazonLocationEndpoint {
     public func url() -> String {
         return "https://tracking.geo.\(region).amazonaws.com/tracking/v0/trackers/\(trackerName)/devices/\(deviceId)/list-positions"
     }
+    
+    public func isApiKeyEndpoint() -> Bool {
+        return false
+    }
 }

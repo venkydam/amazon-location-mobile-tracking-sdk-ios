@@ -6,7 +6,7 @@
       "location" : "https://github.com/makeen-project/amazon-location-mobile-auth-sdk-ios.git",
       "state" : {
         "branch" : "ALMS-134_AmazonHttpClient",
-        "revision" : "eaf39c7b00c93d80a0e40714658fb71bb7bdf30d"
+        "revision" : "a8cbb2a69108b93edb871372a78dff5fafd69236"
       }
     },
     {
