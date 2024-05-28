@@ -314,7 +314,7 @@ final class LocationTrackingTests: XCTestCase {
         
         let positionUpdateResponse = try? await amazonClient!.batchUpdateDevicePosition(trackerName: trackerName, request: batchUpdateRequest)
         
-        XCTAssertEqual(positionUpdateResponse?.statusCode, 200, "Device Position updated successfully")
+        XCTAssertEqual(positionUpdateResponse?.status.statusCode, 200, "Device Position updated successfully")
     }
     
     private func getCurrentDate() -> String {

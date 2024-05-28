@@ -14,8 +14,7 @@ let package = Package(
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
-        .package(url: "https://github.com/makeen-project/amazon-location-mobile-auth-sdk-ios.git", branch: "ALMS-134_AmazonHttpClient"),
-//        .package(url: "https://github.com/aws-amplify/aws-sdk-ios-spm.git", .upToNextMajor(from: "2.0.0"))
+        .package(url: "https://github.com/makeen-project/amazon-location-mobile-auth-sdk-ios.git", branch: "ALMS-134_AmazonHttpClient")
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -23,9 +22,7 @@ let package = Package(
         .target(
             name: "AmazonLocationiOSTrackingSDK",
             dependencies: [
-                .product(name: "AmazonLocationiOSAuthSDK", package: "amazon-location-mobile-auth-sdk-ios"),
-//                .product(name: "AWSLocationXCF", package: "aws-sdk-ios-spm"),
-//                .product(name: "AWSMobileClientXCF", package: "aws-sdk-ios-spm"),
+                .product(name: "AmazonLocationiOSAuthSDK", package: "amazon-location-mobile-auth-sdk-ios")
             ],
             path: "Sources"),
         .testTarget(

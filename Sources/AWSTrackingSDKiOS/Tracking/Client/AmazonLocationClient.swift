@@ -3,29 +3,24 @@ import AmazonLocationiOSAuthSDK
 
 public extension AmazonLocationClient {
     
-    func batchUpdateDevicePosition(trackerName: String, request: BatchUpdateDevicePositionRequest) async throws -> EmptyResponse {
+    func batchUpdateDevicePosition(trackerName: String, request: BatchUpdateDevicePositionRequest) async throws -> AmazonLocationResponse<EmptyData, BatchUpdateDevicePositionErrorsResponse> {
         
-        let result: Result<EmptyResponse, BatchUpdateDevicePositionErrorsResponse> = try await sendRequest(
+        let result: AmazonLocationResponse<EmptyData, BatchUpdateDevicePositionErrorsResponse> = try await sendRequest(
             serviceName: .Location,
             endpoint: BatchUpdateDevicePositionEndpoint(region: locationProvider.getRegion()!, trackerName: trackerName),
             httpMethod: .POST,
             requestBody: request,
-            successType: EmptyResponse.self,
+            successType: EmptyData.self,
             errorType: BatchUpdateDevicePositionErrorsResponse.self
         )
         
-        switch result {
-        case .success(let response):
-            return response
-        case .failure(let errorResponse):
-            throw errorResponse
-        }
+        return result
     }
     
     
-    func getDevicePositionHistory(trackerName: String, deviceId: String, request: GetDevicePositionHistoryRequest) async throws -> GetDevicePositionHistoryResponse {
+    func getDevicePositionHistory(trackerName: String, deviceId: String, request: GetDevicePositionHistoryRequest) async throws -> AmazonLocationResponse<GetDevicePositionHistoryResponse, AmazonErrorResponse> {
         
-        let result: Result<GetDevicePositionHistoryResponse, AmazonErrorResponse> = try await sendRequest(
+        let result: AmazonLocationResponse<GetDevicePositionHistoryResponse, AmazonErrorResponse> = try await sendRequest(
             serviceName: .Location,
             endpoint: GetDevicePositionHistoryEndpoint(region: locationProvider.getRegion()!, trackerName: trackerName, deviceId: deviceId),
             httpMethod: .POST,
@@ -34,11 +29,6 @@ public extension AmazonLocationClient {
             errorType: AmazonErrorResponse.self
         )
         
-        switch result {
-        case .success(let response):
-            return response
-        case .failure(let errorResponse):
-            throw errorResponse
-        }
+        return result
     }
 }

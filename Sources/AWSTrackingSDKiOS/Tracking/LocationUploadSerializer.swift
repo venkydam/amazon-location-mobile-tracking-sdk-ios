@@ -2,7 +2,7 @@ import Foundation
 import AmazonLocationiOSAuthSDK
 import CoreLocation
 
-internal class CognitoLocationUploadSerializer: LocationUploadSerializer {
+internal class LocationUploadSerializer{
     private var deviceId: String
     private var trackerName: String
     private var client: AmazonLocationClient
@@ -13,7 +13,7 @@ internal class CognitoLocationUploadSerializer: LocationUploadSerializer {
         self.client = client
     }
     
-    func updateDeviceLocation(locations: [LocationEntity]) async throws -> EmptyResponse {
+    func updateDeviceLocation(locations: [LocationEntity]) async throws -> AmazonLocationResponse<EmptyData, BatchUpdateDevicePositionErrorsResponse> {
         
         var positions: [Update] = []
         
@@ -28,7 +28,7 @@ internal class CognitoLocationUploadSerializer: LocationUploadSerializer {
         return result
     }
     
-    func getDeviceLocation(nextToken: String? = nil, startTime: Date? = nil, endTime: Date? = nil, maxResults: Int? = nil) async throws -> GetDevicePositionHistoryResponse {
+    func getDeviceLocation(nextToken: String? = nil, startTime: Date? = nil, endTime: Date? = nil, maxResults: Int? = nil) async throws -> AmazonLocationResponse<GetDevicePositionHistoryResponse, AmazonErrorResponse> {
         let startTimeInclusive = startTime != nil ? Utils.jsonDateToString(date: startTime!) : nil
         let endTimeInclusive = endTime != nil ? Utils.jsonDateToString(date: endTime!) : nil
         let request = GetDevicePositionHistoryRequest(startTimeInclusive: startTimeInclusive, endTimeExclusive: endTimeInclusive, maxResults: maxResults, nextToken: nextToken)
