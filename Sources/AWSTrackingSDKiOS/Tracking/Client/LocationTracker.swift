@@ -108,7 +108,7 @@ public class LocationTracker {
         
         if !isTrackingActive {
             locationProvider.subscribeToLocationUpdates { location in
-                self.trackLocation(location: location)
+                //self.trackLocation(location: location)
             }
             isTrackingActive = true
         }
