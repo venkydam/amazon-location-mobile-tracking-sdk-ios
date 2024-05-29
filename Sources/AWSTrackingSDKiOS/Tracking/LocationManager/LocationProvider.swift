@@ -27,10 +27,7 @@ internal class LocationProvider: NSObject, CLLocationManagerDelegate {
     
     @MainActor public func subscribeToLocationUpdates(listener: @escaping Callback) {
         locationUpdateListener = listener
-            locationManager!.delegate = self
-            locationManager!.desiredAccuracy = kCLLocationAccuracyBest
-            locationManager!.requestWhenInUseAuthorization()
-            locationManager!.startUpdatingLocation()
+        locationManager!.startUpdatingLocation()
     }
     
     public func unsubscribeToLocationUpdates() {
