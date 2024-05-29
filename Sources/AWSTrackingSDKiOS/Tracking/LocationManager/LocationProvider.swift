@@ -24,7 +24,7 @@ internal class LocationProvider: NSObject, CLLocationManagerDelegate {
         locationManager?.activityType = CLActivityType(rawValue: activityType) ?? .fitness
     }
     
-    public func subscribeToLocationUpdates(listener: @escaping Callback) {
+    @MainActor public func subscribeToLocationUpdates(listener: @escaping Callback) {
         locationUpdateListener = listener
             locationManager!.delegate = self
             locationManager!.desiredAccuracy = kCLLocationAccuracyBest
