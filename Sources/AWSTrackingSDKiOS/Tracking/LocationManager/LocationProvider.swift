@@ -43,8 +43,24 @@ internal class LocationProvider: NSObject, CLLocationManagerDelegate {
         locationUpdateListener?(location)
     }
     
+//    public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+//        locationPermissionManager?.locationManager(manager, didChangeAuthorization: status)
+//    }
+    
     public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        locationPermissionManager?.locationManager(manager, didChangeAuthorization: status)
+        switch status {
+        case .notDetermined:
+            locationManager!.requestAlwaysAuthorization()
+            break
+        case .restricted, .denied:
+            break
+        case .authorizedWhenInUse:
+            break
+        case .authorizedAlways:
+            break
+        @unknown default:
+            break
+        }
     }
     
     func locationManager(_ manager: CLLocationManager, didStartMonitoringFor region: CLRegion) {

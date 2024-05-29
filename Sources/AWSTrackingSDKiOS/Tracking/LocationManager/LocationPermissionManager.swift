@@ -12,7 +12,7 @@ public class LocationPermissionManager: NSObject, CLLocationManagerDelegate {
     
     override init() {
         super.init()
-        locationManager.delegate = self
+        //locationManager.delegate = self
     }
     
     public func setBackgroundMode(mode: BackgroundTrackingMode) {
