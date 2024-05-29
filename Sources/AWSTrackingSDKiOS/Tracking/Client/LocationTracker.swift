@@ -76,14 +76,7 @@ public class LocationTracker {
         locationProvider.locationPermissionManager?.setBackgroundMode(mode: .None)
         
         locationProvider.subscribeToLocationUpdates { location in
-            Task {
-                do {
-                    _ = try await self.trackLocation(location: location)
-                }
-                catch {
-                    print(error)
-                }
-            }
+            self.trackLocation(location: location)
         }
         isTrackingActive = true
     }
@@ -115,14 +108,7 @@ public class LocationTracker {
         
         if !isTrackingActive {
             locationProvider.subscribeToLocationUpdates { location in
-                Task {
-                    do {
-                        _ = try await self.trackLocation(location: location)
-                    }
-                    catch {
-                        print(error)
-                    }
-                }
+                self.trackLocation(location: location)
             }
             isTrackingActive = true
         }
@@ -156,26 +142,27 @@ public class LocationTracker {
         return try await sendChunkedLocations(locations: chunks, retries: retries)
     }
     
-    internal func trackLocation(location: CLLocation) async throws -> AmazonLocationResponse<EmptyData, BatchUpdateDevicePositionErrorsResponse>? {
+    internal func trackLocation(location: CLLocation) /*async throws -> AmazonLocationResponse<EmptyData, BatchUpdateDevicePositionErrorsResponse>?*/ {
         if(!isTrackingActive) {
-            return nil
+            return
         }
         logger.log("Updated location: \(location.coordinate.latitude), \(location.coordinate.longitude) horizontalAccuracy: \(location.horizontalAccuracy)")
-        return try await setLastKnownLocation(location: location)
+        return setLastKnownLocation(location: location)
     }
     
-    private func setLastKnownLocation(location: CLLocation) async throws -> AmazonLocationResponse<EmptyData, BatchUpdateDevicePositionErrorsResponse>? {
+    private func setLastKnownLocation(location: CLLocation) /*async throws -> AmazonLocationResponse<EmptyData, BatchUpdateDevicePositionErrorsResponse>?*/ {
         locationProvider.lastKnownLocation = getLastLocationEntity()
         let _ = saveLocationToDisk(location: location)
-        
-        let response = try await updateTrackerDeviceLocation()
-        if response != nil && (200...299).contains(response!.status.statusCode) {
-            print("Successfully updated all tracker device location.")
+        Task {
+            let response = try await updateTrackerDeviceLocation()
+            if response != nil && (200...299).contains(response!.status.statusCode) {
+                print("Successfully updated all tracker device location.")
+            }
+            else if response != nil {
+                print("Failed to update tracker device location: \(response!.status.statusCode): \(response!.status.description)")
+            }
         }
-        else if response != nil {
-            print("Failed to update tracker device location: \(response!.status.statusCode): \(response!.status.description)")
-        }
-        return response
+        //return response
     }
     
     private func getLastLocationEntity() -> LocationEntity? {
