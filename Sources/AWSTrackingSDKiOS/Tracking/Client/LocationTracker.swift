@@ -108,7 +108,9 @@ public class LocationTracker {
         
         if !isTrackingActive {
             locationProvider.subscribeToLocationUpdates { location in
-                self.trackLocation(location: location)
+                DispatchQueue.main.async {
+                    self.trackLocation(location: location)
+                }
             }
             isTrackingActive = true
         }
