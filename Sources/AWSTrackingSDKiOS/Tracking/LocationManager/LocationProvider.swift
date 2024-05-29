@@ -42,4 +42,12 @@ internal class LocationProvider: NSObject, CLLocationManagerDelegate {
     public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         locationPermissionManager?.locationManager(manager, didChangeAuthorization: status)
     }
+    
+    func locationManager(_ manager: CLLocationManager, didStartMonitoringFor region: CLRegion) {
+        print(region.identifier)
+    }
+    
+    public func locationManager(_ manager: CLLocationManager, monitoringDidFailFor region: CLRegion?, withError error: any Error) {
+        print(error)
+    }
 }
