@@ -26,7 +26,14 @@ internal class LocationProvider: NSObject, CLLocationManagerDelegate {
     
     public func subscribeToLocationUpdates(listener: @escaping Callback) {
         locationUpdateListener = listener
-        locationManager!.startUpdatingLocation()
+            locationManager!.delegate = self
+            locationManager!.desiredAccuracy = kCLLocationAccuracyBest
+            locationManager!.requestWhenInUseAuthorization()
+        if CLLocationManager.locationServicesEnabled() {
+            locationManager!.startUpdatingLocation()
+        } else {
+            print("Location services are not enabled")
+        }
     }
     
     public func unsubscribeToLocationUpdates() {
