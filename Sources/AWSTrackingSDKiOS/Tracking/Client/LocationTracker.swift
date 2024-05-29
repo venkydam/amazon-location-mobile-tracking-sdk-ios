@@ -64,7 +64,7 @@ public class LocationTracker {
     }
     
     
-    @MainActor public func startTracking() throws {
+     public func startTracking() throws {
         guard let locationPermissionManager = locationProvider.locationPermissionManager else {
               return
         }
