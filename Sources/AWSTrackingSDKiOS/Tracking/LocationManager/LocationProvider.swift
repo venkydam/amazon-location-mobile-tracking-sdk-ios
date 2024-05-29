@@ -26,7 +26,7 @@ internal class LocationProvider: NSObject, CLLocationManagerDelegate {
     
     @MainActor public func subscribeToLocationUpdates(listener: @escaping Callback) {
         //locationUpdateListener = listener
-            self?.locationManager?.startUpdatingLocation()
+        locationManager?.startUpdatingLocation()
     }
     
     public func unsubscribeToLocationUpdates() {
