@@ -29,11 +29,7 @@ internal class LocationProvider: NSObject, CLLocationManagerDelegate {
             locationManager!.delegate = self
             locationManager!.desiredAccuracy = kCLLocationAccuracyBest
             locationManager!.requestWhenInUseAuthorization()
-        if CLLocationManager.locationServicesEnabled() {
             locationManager!.startUpdatingLocation()
-        } else {
-            print("Location services are not enabled")
-        }
     }
     
     public func unsubscribeToLocationUpdates() {
