@@ -50,4 +50,8 @@ internal class LocationProvider: NSObject, CLLocationManagerDelegate {
     public func locationManager(_ manager: CLLocationManager, monitoringDidFailFor region: CLRegion?, withError error: any Error) {
         print(error)
     }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: any Error) {
+        print(error)
+    }
 }
