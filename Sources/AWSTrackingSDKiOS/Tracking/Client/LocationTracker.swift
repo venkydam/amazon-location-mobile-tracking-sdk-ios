@@ -76,7 +76,9 @@ public class LocationTracker {
         locationProvider.locationPermissionManager?.setBackgroundMode(mode: .None)
         
         locationProvider.subscribeToLocationUpdates { location in
-            self.trackLocation(location: location)
+            DispatchQueue.main.async {
+                self.trackLocation(location: location)
+            }
         }
         isTrackingActive = true
     }
@@ -108,9 +110,7 @@ public class LocationTracker {
         
         if !isTrackingActive {
             locationProvider.subscribeToLocationUpdates { location in
-                DispatchQueue.main.async {
-                    self.trackLocation(location: location)
-                }
+                self.trackLocation(location: location)
             }
             isTrackingActive = true
         }
