@@ -64,7 +64,7 @@ public class LocationTracker {
     }
     
     
-    public func startTracking() throws {
+    @MainActor public func startTracking() throws {
         guard let locationPermissionManager = locationProvider.locationPermissionManager else {
               return
         }
@@ -81,7 +81,7 @@ public class LocationTracker {
         isTrackingActive = true
     }
     
-    public func resumeTracking() throws {
+    @MainActor public func resumeTracking() throws {
         try startTracking()
     }
     
@@ -90,7 +90,7 @@ public class LocationTracker {
         isTrackingActive = false
     }
     
-    public func startBackgroundTracking(mode: BackgroundTrackingMode) throws {
+    @MainActor public func startBackgroundTracking(mode: BackgroundTrackingMode) throws {
         
         guard let locationPermissionManager = locationProvider.locationPermissionManager else {
               return
@@ -114,7 +114,7 @@ public class LocationTracker {
         }
     }
     
-    public func resumeBackgroundTracking(mode: BackgroundTrackingMode) throws {
+    @MainActor public func resumeBackgroundTracking(mode: BackgroundTrackingMode) throws {
         try startBackgroundTracking(mode: mode)
     }
     
