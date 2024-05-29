@@ -73,10 +73,10 @@ public class LocationTracker {
             throw TrackingLocationError.permissionDenied
         }
         
-        locationProvider.locationPermissionManager?.setBackgroundMode(mode: .None)
+        locationProvider.locationPermissionManager?.setBackgroundMode(mode: .Active)
         
         locationProvider.subscribeToLocationUpdates { location in
-                self.trackLocation(location: location)
+                //self.trackLocation(location: location)
         }
         isTrackingActive = true
     }
@@ -108,7 +108,7 @@ public class LocationTracker {
         
         if !isTrackingActive {
             locationProvider.subscribeToLocationUpdates { location in
-                //self.trackLocation(location: location)
+                self.trackLocation(location: location)
             }
             isTrackingActive = true
         }
