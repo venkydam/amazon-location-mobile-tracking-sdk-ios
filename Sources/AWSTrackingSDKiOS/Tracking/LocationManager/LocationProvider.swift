@@ -19,9 +19,9 @@ internal class LocationProvider: NSObject, CLLocationManagerDelegate {
     }
     
     public func setFilterValues(trackingDistanceInterval: Double, desiredAccuracy: CLLocationAccuracy, activityType: Int) {
-//        locationManager?.distanceFilter = CLLocationDistance(floatLiteral: trackingDistanceInterval)
-//        locationManager?.desiredAccuracy =  desiredAccuracy
-//        locationManager?.activityType = CLActivityType(rawValue: activityType) ?? .fitness
+        locationManager?.distanceFilter = CLLocationDistance(floatLiteral: trackingDistanceInterval)
+        locationManager?.desiredAccuracy =  desiredAccuracy
+        locationManager?.activityType = CLActivityType(rawValue: activityType) ?? .fitness
     }
     
     @MainActor public func subscribeToLocationUpdates(listener: @escaping Callback) {
