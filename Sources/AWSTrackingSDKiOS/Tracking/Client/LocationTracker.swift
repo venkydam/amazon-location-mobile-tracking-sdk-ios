@@ -76,9 +76,7 @@ public class LocationTracker {
         locationProvider.locationPermissionManager?.setBackgroundMode(mode: .None)
         
         locationProvider.subscribeToLocationUpdates { location in
-            DispatchQueue.main.async {
                 self.trackLocation(location: location)
-            }
         }
         isTrackingActive = true
     }
@@ -152,11 +150,15 @@ public class LocationTracker {
         return setLastKnownLocation(location: location)
     }
     
-    private func setLastKnownLocation(location: CLLocation) /*async throws -> AmazonLocationResponse<EmptyData, BatchUpdateDevicePositionErrorsResponse>?*/ {
-        locationProvider.lastKnownLocation = getLastLocationEntity()
-        let _ = saveLocationToDisk(location: location)
+
+    private func setLastKnownLocation(location: CLLocation) {
         Task {
             do {
+                await MainActor.run {
+                    locationProvider.lastKnownLocation = getLastLocationEntity()
+                    let _ = saveLocationToDisk(location: location)
+                }
+
                 // Perform the network call on a background thread.
                 let response = try await updateTrackerDeviceLocation()
                 
@@ -169,10 +171,11 @@ public class LocationTracker {
                     }
                 }
             } catch {
-                print("Error: \(error.localizedDescription)")
+                await MainActor.run {
+                    print("Error: \(error.localizedDescription)")
+                }
             }
         }
-        //return response
     }
     
     private func getLastLocationEntity() -> LocationEntity? {
