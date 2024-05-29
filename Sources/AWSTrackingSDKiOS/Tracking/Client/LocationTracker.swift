@@ -75,9 +75,9 @@ public class LocationTracker {
         
         locationProvider.locationPermissionManager?.setBackgroundMode(mode: .None)
         
-        locationProvider.subscribeToLocationUpdates { location in
-                //self.trackLocation(location: location)
-        }
+//        locationProvider.subscribeToLocationUpdates { location in
+//                //self.trackLocation(location: location)
+//        }
         isTrackingActive = true
     }
     
