@@ -51,9 +51,8 @@ internal class LocationProvider: NSObject, CLLocationManagerDelegate {
             break
         case .restricted, .denied:
             break
-        case .authorizedWhenInUse:
-            break
-        case .authorizedAlways:
+        case .authorizedWhenInUse, .authorizedAlways:
+            locationManager?.stopUpdatingLocation()
             break
         @unknown default:
             break
