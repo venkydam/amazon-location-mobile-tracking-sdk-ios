@@ -154,12 +154,20 @@ public class LocationTracker {
         locationProvider.lastKnownLocation = getLastLocationEntity()
         let _ = saveLocationToDisk(location: location)
         Task {
-            let response = try await updateTrackerDeviceLocation()
-            if response != nil && (200...299).contains(response!.status.statusCode) {
-                print("Successfully updated all tracker device location.")
-            }
-            else if response != nil {
-                print("Failed to update tracker device location: \(response!.status.statusCode): \(response!.status.description)")
+            do {
+                // Perform the network call on a background thread.
+                let response = try await updateTrackerDeviceLocation()
+                
+                // Switch back to the main thread for UI updates.
+                await MainActor.run {
+                    if (200...299).contains(response!.status.statusCode) {
+                        print("Successfully updated all tracker device location.")
+                    } else {
+                        print("Failed to update tracker device location: \(response!.status.statusCode): \(response!.status.description)")
+                    }
+                }
+            } catch {
+                print("Error: \(error.localizedDescription)")
             }
         }
         //return response
