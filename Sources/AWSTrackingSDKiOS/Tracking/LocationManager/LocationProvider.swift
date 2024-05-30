@@ -44,6 +44,10 @@ internal class LocationProvider: NSObject, CLLocationManagerDelegate {
         locationUpdateListener?(location)
     }
     
+    func locationManager(_ manager: CLLocationManager, didFinishDeferredUpdatesWithError error: (any Error)?) {
+        print(error)
+    }
+    
 //    public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
 //        locationPermissionManager?.locationManager(manager, didChangeAuthorization: status)
 //    }
