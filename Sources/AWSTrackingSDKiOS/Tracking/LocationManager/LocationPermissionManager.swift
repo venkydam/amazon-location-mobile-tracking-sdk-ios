@@ -7,11 +7,11 @@ public enum BackgroundTrackingMode: String {
     case None
 }
 
-public class LocationPermissionManager: NSObject, CLLocationManagerDelegate {
-    internal let locationManager = CLLocationManager()
+public class LocationPermissionManager {
+    internal let locationManager: CLLocationManager
     
-    override init() {
-        super.init()
+    init(locationManager: CLLocationManager) {
+        self.locationManager = locationManager
         //locationManager.delegate = self
     }
     
@@ -72,19 +72,19 @@ public class LocationPermissionManager: NSObject, CLLocationManagerDelegate {
         return CLLocationManager.authorizationStatus()
     }
     
-    public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        switch status {
-        case .notDetermined:
-            requestAlwaysPermission()
-            break
-        case .restricted, .denied:
-            break
-        case .authorizedWhenInUse:
-            break
-        case .authorizedAlways:
-            break
-        @unknown default:
-            break
-        }
-    }
+//    public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+//        switch status {
+//        case .notDetermined:
+//            requestAlwaysPermission()
+//            break
+//        case .restricted, .denied:
+//            break
+//        case .authorizedWhenInUse:
+//            break
+//        case .authorizedAlways:
+//            break
+//        @unknown default:
+//            break
+//        }
+//    }
 }

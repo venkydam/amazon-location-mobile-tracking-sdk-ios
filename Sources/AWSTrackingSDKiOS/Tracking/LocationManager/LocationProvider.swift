@@ -5,7 +5,7 @@ public typealias Callback = (CLLocation) -> Void
 internal class LocationProvider: NSObject, CLLocationManagerDelegate {
     
     public var locationPermissionManager: LocationPermissionManager?
-    private var locationManager: CLLocationManager?
+    private var locationManager: CLLocationManager = CLLocationManager()
     
     public var lastKnownLocation: LocationEntity?
     
@@ -13,28 +13,27 @@ internal class LocationProvider: NSObject, CLLocationManagerDelegate {
     
     public override init() {
         super.init()
-        self.locationPermissionManager = LocationPermissionManager()
-        self.locationManager = locationPermissionManager?.locationManager
-        self.locationManager?.delegate = self
-        locationManager!.startUpdatingLocation()
+        self.locationPermissionManager = LocationPermissionManager(locationManager: self.locationManager)
+        self.locationManager.delegate = self
+        locationManager.startUpdatingLocation()
     }
     
     public func setFilterValues(trackingDistanceInterval: Double, desiredAccuracy: CLLocationAccuracy, activityType: Int) {
-        locationManager?.distanceFilter = CLLocationDistance(floatLiteral: trackingDistanceInterval)
-        locationManager?.desiredAccuracy =  desiredAccuracy
-        locationManager?.activityType = CLActivityType(rawValue: activityType) ?? .fitness
+        locationManager.distanceFilter = CLLocationDistance(floatLiteral: trackingDistanceInterval)
+        locationManager.desiredAccuracy =  desiredAccuracy
+        locationManager.activityType = CLActivityType(rawValue: activityType) ?? .fitness
     }
     
     public func subscribeToLocationUpdates(listener: @escaping Callback) {
         locationUpdateListener = listener
         let yes = locationPermissionManager?.hasLocationPermission()
         print(yes!)
-        locationManager!.startUpdatingLocation()
+        locationManager.startUpdatingLocation()
     }
     
     public func unsubscribeToLocationUpdates() {
         locationUpdateListener = nil
-        locationManager?.stopUpdatingLocation()
+        locationManager.stopUpdatingLocation()
     }
     
     public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -49,12 +48,12 @@ internal class LocationProvider: NSObject, CLLocationManagerDelegate {
     public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         switch status {
         case .notDetermined:
-            locationManager!.requestAlwaysAuthorization()
+            locationManager.requestAlwaysAuthorization()
             break
         case .restricted, .denied:
             break
         case .authorizedWhenInUse, .authorizedAlways:
-            locationManager?.startUpdatingLocation()
+            locationManager.startUpdatingLocation()
             break
         @unknown default:
             break
