@@ -15,10 +15,6 @@ internal class LocationProvider: NSObject, CLLocationManagerDelegate {
         super.init()
         self.locationPermissionManager = LocationPermissionManager(locationManager: self.locationManager)
         self.locationManager.delegate = self
-               // locationManager.requestWhenInUseAuthorization()
-                //locationManager.stopUpdatingLocation()     // request will restart it
-
-        locationManager.requestWhenInUseAuthorization()
     }
     
     public func setFilterValues(trackingDistanceInterval: Double, desiredAccuracy: CLLocationAccuracy, activityType: Int) {
@@ -29,8 +25,6 @@ internal class LocationProvider: NSObject, CLLocationManagerDelegate {
     
     public func subscribeToLocationUpdates(listener: @escaping Callback) {
         locationUpdateListener = listener
-        let yes = locationPermissionManager?.hasLocationPermission()
-        print(yes!)
         locationManager.startUpdatingLocation()
     }
     
@@ -43,14 +37,6 @@ internal class LocationProvider: NSObject, CLLocationManagerDelegate {
         guard let location = locations.last else { return }
         locationUpdateListener?(location)
     }
-    
-    func locationManager(_ manager: CLLocationManager, didFinishDeferredUpdatesWithError error: (any Error)?) {
-        print(error)
-    }
-    
-//    public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-//        locationPermissionManager?.locationManager(manager, didChangeAuthorization: status)
-//    }
     
     public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         switch status {
