@@ -5,7 +5,7 @@ public typealias Callback = (CLLocation) -> Void
 internal class LocationProvider: NSObject, CLLocationManagerDelegate {
     
     public var locationPermissionManager: LocationPermissionManager?
-    private var locationManager: CLLocationManager = CLLocationManager()
+    internal let locationManager: CLLocationManager = CLLocationManager()
     
     public var lastKnownLocation: LocationEntity?
     
