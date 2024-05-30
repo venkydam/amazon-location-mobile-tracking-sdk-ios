@@ -161,13 +161,14 @@ public class LocationTracker {
                 locationProvider.lastKnownLocation = getLastLocationEntity()
                 let _ = saveLocationToDisk(location: location)
 
-                let response = try await updateTrackerDeviceLocation()
-                
-                if (200...299).contains(response!.status.statusCode) {
-                    print("Successfully updated all tracker device location.")
-                } else {
-                    print("Failed to update tracker device location: \(response!.status.statusCode): \(response!.status.description)")
+                if let response = try await self.updateTrackerDeviceLocation() {
+                    
+                    if (200...299).contains(response.status.statusCode) {
+                        print("Successfully updated all tracker device location.")
+                    } else {
+                        print("Failed to update tracker device location: \(response.status.statusCode): \(response.status.description)")
                     }
+                }
             } catch {
                     print("Error: \(error.localizedDescription)")
             }
@@ -236,7 +237,9 @@ public class LocationTracker {
         if locationUploadSerializer != nil {
             return try await updateLocations(serializer: locationUploadSerializer!, locations: locations, chunk: chunk, retries: retries)
         }
-        return nil
+        else {
+            return nil
+        }
     }
     
     private func updateLocations(serializer: LocationUploadSerializer, locations: [[LocationEntity]], chunk: [LocationEntity], retries: Int) async throws -> AmazonLocationResponse<EmptyData, BatchUpdateDevicePositionErrorsResponse>? {
