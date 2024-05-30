@@ -146,7 +146,7 @@ public class LocationTracker {
         return try await sendChunkedLocations(locations: chunks, retries: retries)
     }
     
-    internal func trackLocation(location: CLLocation) /*async throws -> AmazonLocationResponse<EmptyData, BatchUpdateDevicePositionErrorsResponse>?*/ {
+    internal func trackLocation(location: CLLocation) {
         if(!isTrackingActive) {
             return
         }

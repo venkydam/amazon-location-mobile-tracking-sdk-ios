@@ -12,7 +12,6 @@ public class LocationPermissionManager {
     
     init(locationManager: CLLocationManager) {
         self.locationManager = locationManager
-        //locationManager.delegate = self
     }
     
     public func setBackgroundMode(mode: BackgroundTrackingMode) {
@@ -71,20 +70,4 @@ public class LocationPermissionManager {
     public func checkPermission() -> CLAuthorizationStatus {
         return CLLocationManager.authorizationStatus()
     }
-    
-//    public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-//        switch status {
-//        case .notDetermined:
-//            requestAlwaysPermission()
-//            break
-//        case .restricted, .denied:
-//            break
-//        case .authorizedWhenInUse:
-//            break
-//        case .authorizedAlways:
-//            break
-//        @unknown default:
-//            break
-//        }
-//    }
 }
