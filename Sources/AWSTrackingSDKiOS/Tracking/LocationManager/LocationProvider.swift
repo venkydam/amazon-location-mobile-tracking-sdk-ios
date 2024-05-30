@@ -63,6 +63,10 @@ internal class LocationProvider: NSObject, CLLocationManagerDelegate {
         }
     }
     
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        print(CLLocationManager.authorizationStatus())
+    }
+    
     func locationManager(_ manager: CLLocationManager, didStartMonitoringFor region: CLRegion) {
         print(region.identifier)
     }
