@@ -85,7 +85,7 @@ public class LocationTracker {
         isTrackingActive = true
     }
     
-    @MainActor public func resumeTracking() throws {
+    public func resumeTracking() throws {
         try startTracking()
     }
     
@@ -94,7 +94,7 @@ public class LocationTracker {
         isTrackingActive = false
     }
     
-    @MainActor public func startBackgroundTracking(mode: BackgroundTrackingMode) throws {
+    public func startBackgroundTracking(mode: BackgroundTrackingMode) throws {
         
         guard let locationPermissionManager = locationProvider.locationPermissionManager else {
               return
@@ -118,7 +118,7 @@ public class LocationTracker {
         }
     }
     
-    @MainActor public func resumeBackgroundTracking(mode: BackgroundTrackingMode) throws {
+    public func resumeBackgroundTracking(mode: BackgroundTrackingMode) throws {
         try startBackgroundTracking(mode: mode)
     }
     
@@ -158,26 +158,18 @@ public class LocationTracker {
     private func setLastKnownLocation(location: CLLocation) {
         Task {
             do {
-                await MainActor.run {
-                    locationProvider.lastKnownLocation = getLastLocationEntity()
-                    let _ = saveLocationToDisk(location: location)
-                }
+                locationProvider.lastKnownLocation = getLastLocationEntity()
+                let _ = saveLocationToDisk(location: location)
 
-                // Perform the network call on a background thread.
                 let response = try await updateTrackerDeviceLocation()
                 
-                // Switch back to the main thread for UI updates.
-                await MainActor.run {
-                    if (200...299).contains(response!.status.statusCode) {
-                        print("Successfully updated all tracker device location.")
-                    } else {
-                        print("Failed to update tracker device location: \(response!.status.statusCode): \(response!.status.description)")
+                if (200...299).contains(response!.status.statusCode) {
+                    print("Successfully updated all tracker device location.")
+                } else {
+                    print("Failed to update tracker device location: \(response!.status.statusCode): \(response!.status.description)")
                     }
-                }
             } catch {
-                await MainActor.run {
                     print("Error: \(error.localizedDescription)")
-                }
             }
         }
     }
