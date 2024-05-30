@@ -15,7 +15,6 @@ internal class LocationProvider: NSObject, CLLocationManagerDelegate {
         super.init()
         self.locationPermissionManager = LocationPermissionManager(locationManager: self.locationManager)
         self.locationManager.delegate = self
-        locationManager.startUpdatingLocation()
     }
     
     public func setFilterValues(trackingDistanceInterval: Double, desiredAccuracy: CLLocationAccuracy, activityType: Int) {
