@@ -36,4 +36,20 @@ public extension AmazonLocationClient {
         }
         return nil
     }
+    
+    func batchEvaluateGeofences(input: BatchEvaluateGeofencesInput) async throws -> BatchEvaluateGeofencesOutput? {
+        do {
+            if locationProvider.getCognitoProvider() != nil {
+                if locationClient == nil {
+                    try await initialiseLocationClient()
+                }
+                let response = try await locationClient!.batchEvaluateGeofences(input: input)
+                return response
+            }
+        }
+        catch {
+            throw error
+        }
+        return nil
+    }
 }

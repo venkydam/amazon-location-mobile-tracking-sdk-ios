@@ -33,4 +33,8 @@ internal class LocationUploadSerializer{
         let result = try await client.getDevicePositionHistory(input: request)
         return result
     }
+    
+    func batchEvaluateGeofences(input: BatchEvaluateGeofencesInput) async throws -> BatchEvaluateGeofencesOutput? {
+        return try await client.batchEvaluateGeofences(input: input)
+    }
 }

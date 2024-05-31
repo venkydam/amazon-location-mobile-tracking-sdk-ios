@@ -140,6 +140,13 @@ public class LocationTracker {
         return locationProvider.lastKnownLocation
     }
     
+    public func batchEvaluateGeofences(input: BatchEvaluateGeofencesInput) async throws -> BatchEvaluateGeofencesOutput? {
+        if locationUploadSerializer != nil {
+            return try await locationUploadSerializer?.batchEvaluateGeofences(input: input)
+        }
+        return nil
+    }
+    
     private func updateTrackerDeviceLocation(retries: Int = 3) async throws ->  BatchUpdateDevicePositionOutput? {
         let locations = locationDatabase.fetchAll()
         let filteredLocations = filterLocations(locations: locations)
