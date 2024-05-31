@@ -1,6 +1,7 @@
 import Foundation
 import AmazonLocationiOSAuthSDK
 import CoreLocation
+import AWSLocation
 
 internal class LocationUploadSerializer{
     private var deviceId: String
@@ -13,27 +14,27 @@ internal class LocationUploadSerializer{
         self.client = client
     }
     
-    func updateDeviceLocation(locations: [LocationEntity]) async throws -> AmazonLocationResponse<EmptyData, BatchUpdateDevicePositionErrorsResponse> {
-        
-        var positions: [Update] = []
+    func updateDeviceLocation(locations: [LocationEntity]) async throws -> BatchUpdateDevicePositionOutput? {
+        var positions: [LocationClientTypes.DevicePositionUpdate] = []
         
         for location in locations {
-            let positionUpdate = Update(positionAccuracy: .init(horizontal: location.accuracy), deviceId: deviceId, position: [location.longitude, location.latitude], positionProperties: [:], sampleTime: Utils.jsonDateToString(date: Date()))
+            let positionUpdate = LocationClientTypes.DevicePositionUpdate(accuracy: .init(horizontal: location.accuracy), deviceId: deviceId, position: [location.longitude, location.latitude], positionProperties: [:], sampleTime: Date())
             positions.append(positionUpdate)
         }
 
-        let request = BatchUpdateDevicePositionRequest(updates: positions)
-        let result = try await client.batchUpdateDevicePosition(trackerName: trackerName, request: request)
+        let input = BatchUpdateDevicePositionInput(trackerName: trackerName, updates: positions)
+        let result = try await client.batchUpdateDevicePosition(input: input)
         
         return result
     }
     
-    func getDeviceLocation(nextToken: String? = nil, startTime: Date? = nil, endTime: Date? = nil, maxResults: Int? = nil) async throws -> AmazonLocationResponse<GetDevicePositionHistoryResponse, AmazonErrorResponse> {
-        let startTimeInclusive = startTime != nil ? Utils.jsonDateToString(date: startTime!) : nil
-        let endTimeInclusive = endTime != nil ? Utils.jsonDateToString(date: endTime!) : nil
-        let request = GetDevicePositionHistoryRequest(startTimeInclusive: startTimeInclusive, endTimeExclusive: endTimeInclusive, maxResults: maxResults, nextToken: nextToken)
-        
-        let result = try await client.getDevicePositionHistory(trackerName: trackerName, deviceId: deviceId, request: request)
+    func getDeviceLocation(nextToken: String? = nil, startTime: Date? = nil, endTime: Date? = nil, maxResults: Int? = nil) async throws -> GetDevicePositionHistoryOutput? {
+        let request = GetDevicePositionHistoryInput(deviceId: deviceId, endTimeExclusive: endTime, maxResults: maxResults, nextToken: nextToken, startTimeInclusive: startTime, trackerName: trackerName)
+        let result = try await client.getDevicePositionHistory(input: request)
         return result
+    }
+    
+    func batchEvaluateGeofences(input: BatchEvaluateGeofencesInput) async throws -> BatchEvaluateGeofencesOutput? {
+        return try await client.batchEvaluateGeofences(input: input)
     }
 }

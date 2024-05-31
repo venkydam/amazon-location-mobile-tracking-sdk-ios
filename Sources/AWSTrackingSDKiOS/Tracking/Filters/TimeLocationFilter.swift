@@ -4,7 +4,7 @@ public class TimeLocationFilter: LocationFilter {
     }
     
     public func shouldUpload(currentLocation: LocationEntity, previousLocation: LocationEntity?, trackerConfig: LocationTrackerConfig) -> Bool {
-        if (previousLocation == nil  || previousLocation?.timestamp == nil) {
+        if (currentLocation.timestamp == nil || previousLocation == nil  || previousLocation?.timestamp == nil) {
             return true
         }
         let durationInSeconds = currentLocation.timestamp!.timeIntervalSince(previousLocation!.timestamp!)
