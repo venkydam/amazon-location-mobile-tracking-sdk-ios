@@ -181,12 +181,14 @@ public class LocationTracker {
         if locationEx != nil {
             let context = CoreDataStack.shared.persistentContainer.viewContext
             let newLocationEntity = LocationEntity(context: context)
-            newLocationEntity.id = UUID(uuidString: locationEx!.id!)
-            newLocationEntity.longitude = locationEx!.longitude
-            newLocationEntity.latitude = locationEx!.latitude
-            newLocationEntity.timestamp = locationEx!.timestamp
-            newLocationEntity.accuracy = locationEx!.accuracy
-            return newLocationEntity
+            if let id = locationEx!.id{
+                newLocationEntity.id = UUID(uuidString: id)
+                newLocationEntity.longitude = locationEx!.longitude
+                newLocationEntity.latitude = locationEx!.latitude
+                newLocationEntity.timestamp = locationEx!.timestamp
+                newLocationEntity.accuracy = locationEx!.accuracy
+                return newLocationEntity
+            }
         }
         return nil
     }
