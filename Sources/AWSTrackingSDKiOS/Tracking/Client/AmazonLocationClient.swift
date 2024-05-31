@@ -5,7 +5,7 @@ import AWSClientRuntime
 
 public extension AmazonLocationClient {
     
-    func batchUpdateDevicePosition(trackerName: String, input: BatchUpdateDevicePositionInput) async throws -> BatchUpdateDevicePositionOutput? {
+    func batchUpdateDevicePosition(input: BatchUpdateDevicePositionInput) async throws -> BatchUpdateDevicePositionOutput? {
         do {
             if locationProvider.getCognitoProvider() != nil {
                 if locationClient == nil {
@@ -21,7 +21,7 @@ public extension AmazonLocationClient {
         return nil
     }
     
-    func getDevicePositionHistory(trackerName: String, deviceId: String, input: GetDevicePositionHistoryInput) async throws -> GetDevicePositionHistoryOutput? {
+    func getDevicePositionHistory(input: GetDevicePositionHistoryInput) async throws -> GetDevicePositionHistoryOutput? {
         do {
             if locationProvider.getCognitoProvider() != nil {
                 if locationClient == nil {

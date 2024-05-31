@@ -22,15 +22,15 @@ internal class LocationUploadSerializer{
             positions.append(positionUpdate)
         }
 
-        let input = BatchUpdateDevicePositionInput(updates: positions)
-        let result = try await client.batchUpdateDevicePosition(trackerName: trackerName, input: input)
+        let input = BatchUpdateDevicePositionInput(trackerName: trackerName, updates: positions)
+        let result = try await client.batchUpdateDevicePosition(input: input)
         
         return result
     }
     
     func getDeviceLocation(nextToken: String? = nil, startTime: Date? = nil, endTime: Date? = nil, maxResults: Int? = nil) async throws -> GetDevicePositionHistoryOutput? {
-        let request = GetDevicePositionHistoryInput(endTimeExclusive: endTime, maxResults: maxResults, nextToken: nextToken, startTimeInclusive: startTime)
-        let result = try await client.getDevicePositionHistory(trackerName: trackerName, deviceId: deviceId, input: request)
+        let request = GetDevicePositionHistoryInput(deviceId: deviceId, endTimeExclusive: endTime, maxResults: maxResults, nextToken: nextToken, startTimeInclusive: startTime, trackerName: trackerName)
+        let result = try await client.getDevicePositionHistory(input: request)
         return result
     }
 }
