@@ -2,7 +2,7 @@ import XCTest
 import CoreLocation
 @testable import AmazonLocationiOSTrackingSDK
 import AmazonLocationiOSAuthSDK
-import AWSLocationXCF
+import AWSLocation
 
 final class LocationTrackingTests: XCTestCase {
     
@@ -282,13 +282,13 @@ final class LocationTrackingTests: XCTestCase {
     }
 
     func testLocationManager() {
-        let locationManager = LocationPermissionManager()
-        locationManager.setBackgroundMode(mode: .None)
+        let locationProvider = LocationProvider()
+        locationProvider.locationPermissionManager!.setBackgroundMode(mode: .None)
         
-        XCTAssertEqual(locationManager.hasLocationPermission(), false)
-        XCTAssertEqual(locationManager.hasAlwaysLocationPermission(), false)
-        XCTAssertEqual(locationManager.hasLocationPermissionDenied(), false)
-        XCTAssertEqual(locationManager.checkPermission() , .notDetermined)
+        XCTAssertEqual(locationProvider.locationPermissionManager!.hasLocationPermission(), false)
+        XCTAssertEqual(locationProvider.locationPermissionManager!.hasAlwaysLocationPermission(), false)
+        XCTAssertEqual(locationProvider.locationPermissionManager!.hasLocationPermissionDenied(), false)
+        XCTAssertEqual(locationProvider.locationPermissionManager!.checkPermission() , .notDetermined)
     }
     
     func testBatchUpdateDevicePosition() async throws {
@@ -302,19 +302,13 @@ final class LocationTrackingTests: XCTestCase {
         
         let amazonClient = authHelper.getLocationClient()
         
-        let positionAccuracy = PositionAccuracy(horizontal: 5.0)
-        let update = Update(
-            positionAccuracy: positionAccuracy,
-            deviceId: "device123",
-            position: [-123.063554, 49.246559 ],
-            positionProperties: nil,
-            sampleTime: getCurrentDate()
-        )
-        let batchUpdateRequest = BatchUpdateDevicePositionRequest(updates: [update])
+        let update = LocationClientTypes.DevicePositionUpdate(accuracy: LocationClientTypes.PositionalAccuracy.init(horizontal: 1), deviceId: "DeviceID", position: [-71.985564, 41.758023], positionProperties: nil, sampleTime: Date())
+        let updates = [update]
+        let input = BatchUpdateDevicePositionInput(trackerName: "TrackingSDKTracker", updates: updates)
         
-        let positionUpdateResponse = try? await amazonClient!.batchUpdateDevicePosition(trackerName: trackerName, request: batchUpdateRequest)
+        let positionUpdateResponse = try? await amazonClient!.batchUpdateDevicePosition(trackerName: trackerName, input: input)
         
-        XCTAssertEqual(positionUpdateResponse?.status.statusCode, 200, "Device Position updated successfully")
+        XCTAssertEqual(positionUpdateResponse?.errors?.count, 0, "Device Position updated successfully")
     }
     
     private func getCurrentDate() -> String {
