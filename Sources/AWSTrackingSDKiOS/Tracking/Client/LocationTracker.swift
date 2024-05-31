@@ -177,18 +177,15 @@ public class LocationTracker {
     }
     
     private func getLastLocationEntity() -> LocationEntity? {
-        let locationEx = UserDefaultsHelper.getObject(value: LocationEx.self, key: .LastLocationEntity)
-        if locationEx != nil {
+        if let locationEx = UserDefaultsHelper.getObject(value: LocationEx.self, key: .LastLocationEntity), let id = locationEx.id {
             let context = CoreDataStack.shared.persistentContainer.viewContext
             let newLocationEntity = LocationEntity(context: context)
-            if let id = locationEx!.id{
-                newLocationEntity.id = UUID(uuidString: id)
-                newLocationEntity.longitude = locationEx!.longitude
-                newLocationEntity.latitude = locationEx!.latitude
-                newLocationEntity.timestamp = locationEx!.timestamp
-                newLocationEntity.accuracy = locationEx!.accuracy
-                return newLocationEntity
-            }
+            newLocationEntity.id = UUID(uuidString: id)
+            newLocationEntity.longitude = locationEx.longitude
+            newLocationEntity.latitude = locationEx.latitude
+            newLocationEntity.timestamp = locationEx.timestamp
+            newLocationEntity.accuracy = locationEx.accuracy
+            return newLocationEntity
         }
         return nil
     }
