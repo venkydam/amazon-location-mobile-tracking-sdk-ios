@@ -1,13 +1,13 @@
 import Foundation
 import CoreLocation
 import AmazonLocationiOSAuthSDK
-import AWSLocationXCF
+import AWSLocation
 
 public class LocationTracker {
     
     internal var locationProvider: LocationProvider
-    private var cognitoLocationUploadSerializer: CognitoLocationUploadSerializer?
-    internal var amazonLocationClient: AWSLocation?
+    private var locationUploadSerializer: LocationUploadSerializer?
+    internal var amazonLocationClient: AmazonLocationClient?
     private var locationDatabase: LocationDatabase
     internal var isTrackingActive: Bool = false
     private var logger: Logger
@@ -35,8 +35,8 @@ public class LocationTracker {
         }
         
         if provider.getCognitoProvider() != nil {
-            amazonLocationClient = AWSLocation.default()
-            cognitoLocationUploadSerializer = CognitoLocationUploadSerializer(client: amazonLocationClient!, deviceId: deviceId, trackerName: self.trackerName)
+            amazonLocationClient = AmazonLocationClient(locationCredentialsProvider: provider)
+            locationUploadSerializer = LocationUploadSerializer(client: amazonLocationClient!, deviceId: deviceId, trackerName: self.trackerName)
         }
         
         logger.log("Location Tracker intialized")
@@ -65,7 +65,7 @@ public class LocationTracker {
     }
     
     
-    public func startTracking() throws {
+     public func startTracking() throws {
         guard let locationPermissionManager = locationProvider.locationPermissionManager else {
               return
         }
@@ -74,12 +74,14 @@ public class LocationTracker {
             throw TrackingLocationError.permissionDenied
         }
         
+         if locationPermissionManager.checkPermission() == .notDetermined {
+             locationProvider.locationManager.requestLocation()
+         }
+         
         locationProvider.locationPermissionManager?.setBackgroundMode(mode: .None)
         
         locationProvider.subscribeToLocationUpdates { location in
-            self.trackLocation(location: location) {  success, error in
-                
-            }
+                self.trackLocation(location: location)
         }
         isTrackingActive = true
     }
@@ -111,9 +113,7 @@ public class LocationTracker {
         
         if !isTrackingActive {
             locationProvider.subscribeToLocationUpdates { location in
-                self.trackLocation(location: location) {  success, error in
-                    
-                }
+                self.trackLocation(location: location)
             }
             isTrackingActive = true
         }
@@ -129,55 +129,69 @@ public class LocationTracker {
         isTrackingActive = false
     }
     
-    public func getTrackerDeviceLocation(nextToken: String?, startTime: Date? = nil, endTime: Date? = nil, completion: @escaping (Result<GetLocationResponse, Error>) -> Void) {
-        if cognitoLocationUploadSerializer != nil {
-            getTrackerDeviceLocations(with: cognitoLocationUploadSerializer!, nextToken: nil, completion: completion)
+    public func getTrackerDeviceLocation(nextToken: String?, startTime: Date? = nil, endTime: Date? = nil, maxResults: Int? = nil) async throws -> GetDevicePositionHistoryOutput? {
+        if locationUploadSerializer != nil {
+           return try await getTrackerDeviceLocations(with: locationUploadSerializer!, nextToken: nil, startTime: startTime, endTime: endTime, maxResults: maxResults)
         }
+        return nil
     }
     
     public func getDeviceLocation() -> LocationEntity? {
         return locationProvider.lastKnownLocation
     }
     
-    private func updateTrackerDeviceLocation(retries: Int = 3, completion: @escaping (Bool, Error?) -> Void) {
+    public func batchEvaluateGeofences(input: BatchEvaluateGeofencesInput) async throws -> BatchEvaluateGeofencesOutput? {
+        if locationUploadSerializer != nil {
+            return try await locationUploadSerializer?.batchEvaluateGeofences(input: input)
+        }
+        return nil
+    }
+    
+    private func updateTrackerDeviceLocation(retries: Int = 3) async throws ->  BatchUpdateDevicePositionOutput? {
         let locations = locationDatabase.fetchAll()
         let filteredLocations = filterLocations(locations: locations)
         let chunks = Utils.chunked(filteredLocations, size: 10)
-        sendChunkedLocations(locations: chunks, retries: retries, completion: completion)
+        return try await sendChunkedLocations(locations: chunks, retries: retries)
     }
     
-    internal func trackLocation(location: CLLocation, completion: @escaping (Bool, Error?) -> Void) {
+    internal func trackLocation(location: CLLocation) {
         if(!isTrackingActive) {
             return
         }
         logger.log("Updated location: \(location.coordinate.latitude), \(location.coordinate.longitude) horizontalAccuracy: \(location.horizontalAccuracy)")
-        self.setLastKnownLocation(location: location, completion: completion)
+        return setLastKnownLocation(location: location)
     }
     
-    private func setLastKnownLocation(location: CLLocation, completion: @escaping (Bool, Error?) -> Void) {
-        locationProvider.lastKnownLocation = getLastLocationEntity()
-        let _ = saveLocationToDisk(location: location)
-        
-        updateTrackerDeviceLocation { success, error in
-            if success {
-                print("Successfully updated all tracker device location.")
-            } else if let error = error {
-                print("Failed to update tracker device location: \(error)")
+
+    private func setLastKnownLocation(location: CLLocation) {
+        Task {
+            do {
+                locationProvider.lastKnownLocation = getLastLocationEntity()
+                let _ = saveLocationToDisk(location: location)
+
+                if let response = try await self.updateTrackerDeviceLocation() {
+                    
+                    if response.errors?.count == 0 {
+                        print("Successfully updated all tracker device location.")
+                    } else {
+                        print("Failed to update tracker device location: \(String(describing: response.errors?.first?.error?.code)): \(String(describing: response.errors?.first?.error?.message))")
+                    }
+                }
+            } catch {
+                    print("Error: \(error.localizedDescription)")
             }
-            completion(success, error)
         }
     }
     
     private func getLastLocationEntity() -> LocationEntity? {
-        let locationEx = UserDefaultsHelper.getObject(value: LocationEx.self, key: .LastLocationEntity)
-        if locationEx != nil {
+        if let locationEx = UserDefaultsHelper.getObject(value: LocationEx.self, key: .LastLocationEntity), let id = locationEx.id {
             let context = CoreDataStack.shared.persistentContainer.viewContext
             let newLocationEntity = LocationEntity(context: context)
-            newLocationEntity.id = UUID(uuidString: locationEx!.id!)
-            newLocationEntity.longitude = locationEx!.longitude
-            newLocationEntity.latitude = locationEx!.latitude
-            newLocationEntity.timestamp = locationEx!.timestamp
-            newLocationEntity.accuracy = locationEx!.accuracy
+            newLocationEntity.id = UUID(uuidString: id)
+            newLocationEntity.longitude = locationEx.longitude
+            newLocationEntity.latitude = locationEx.latitude
+            newLocationEntity.timestamp = locationEx.timestamp
+            newLocationEntity.accuracy = locationEx.accuracy
             return newLocationEntity
         }
         return nil
@@ -191,15 +205,8 @@ public class LocationTracker {
         }
     }
 
-    private func getTrackerDeviceLocations<S: LocationUploadSerializer>(with serializer: S, nextToken: String?, startTime: Date? = nil, endTime: Date? = nil, completion: @escaping (Result<GetLocationResponse, Error>) -> Void) {
-        serializer.getDeviceLocation(nextToken: nextToken, startTime: startTime, endTime: endTime) { result in
-            switch result {
-            case .success(let response):
-                completion(.success(response as! GetLocationResponse))
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
+    private func getTrackerDeviceLocations<S: LocationUploadSerializer>(with serializer: S, nextToken: String?, startTime: Date? = nil, endTime: Date? = nil, maxResults: Int? = nil)  async throws -> GetDevicePositionHistoryOutput? {
+        return try await serializer.getDeviceLocation(nextToken: nextToken, startTime: startTime, endTime: endTime, maxResults: maxResults)
     }
     
     private func filterLocations(locations: [LocationEntity]) -> [LocationEntity] {
@@ -226,40 +233,43 @@ public class LocationTracker {
         return filteredLocations
     }
     
-    private func sendChunkedLocations(locations: [[LocationEntity]], retries: Int, completion: @escaping (Bool, Error?) -> Void) {
+    private func sendChunkedLocations(locations: [[LocationEntity]], retries: Int) async throws -> BatchUpdateDevicePositionOutput? {
         guard !locations.isEmpty else {
             self.logger.log("All locations uploaded successfully")
-            completion(true, nil)
-            return
+            return nil
         }
         
         let chunk = locations.first!
         
-        if cognitoLocationUploadSerializer != nil {
-            updateLocations(with: cognitoLocationUploadSerializer!, locations: locations, chunk: chunk, retries: retries, completion: completion)
+        if locationUploadSerializer != nil {
+            return try await updateLocations(serializer: locationUploadSerializer!, locations: locations, chunk: chunk, retries: retries)
+        }
+        else {
+            return nil
         }
     }
     
-    private func updateLocations<S: LocationUploadSerializer>(with serializer: S, locations: [[LocationEntity]], chunk: [LocationEntity], retries: Int, completion: @escaping (Bool, Error?) -> Void) {
-        serializer.updateDeviceLocation(locations: chunk, completion: { result in
-            switch result {
-            case .success:
-                self.logger.log("\(chunk.count) Tracking locations uploaded successfully")
-                self.locationDatabase.delete(locations: chunk)
-                self.sendChunkedLocations(locations: Array(locations.dropFirst()), retries: 3, completion: completion)
-            case .failure(let error):
-                self.logger.log("Error: \(error)")
-                if retries > 0 {
-                    self.logger.log("Retrying...")
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                        self.sendChunkedLocations(locations: locations, retries: retries - 1, completion: completion)
-                    }
-                } else {
-                    self.logger.log("Failed after 3 retries")
-                    completion(false, error)
+    private func updateLocations(serializer: LocationUploadSerializer, locations: [[LocationEntity]], chunk: [LocationEntity], retries: Int) async throws -> BatchUpdateDevicePositionOutput? {
+        let response = try await serializer.updateDeviceLocation(locations: chunk)
+        if response?.errors?.count == 0 {
+            self.logger.log("\(chunk.count) Tracking locations uploaded successfully")
+            self.locationDatabase.delete(locations: chunk)
+            return try await sendChunkedLocations(locations: Array(locations.dropFirst()), retries: 3)
+        }
+        else {
+            self.logger.log("Error: \(String(describing: response?.errors?.first?.error?.code)):\(String(describing: response?.errors?.first?.error?.message))")
+            if retries > 0 {
+                self.logger.log("Retrying...")
+                return try await sendChunkedLocations(locations: locations, retries: retries - 1)
+            } else {
+                self.logger.log("Failed after 3 retries")
+                if let error = response?.errors?.first?.error {
+                    let code = (error.code)?.rawValue
+                    throw NSError(domain: "batchUpdateDevicePostion", code: 0, userInfo: [NSLocalizedDescriptionKey: "\(String(describing: code)): \(error.message!)"])
                 }
             }
-        })
+        }
+        return nil
     }
     
     private func saveLocationToDisk(location: CLLocation) -> LocationEntity? {

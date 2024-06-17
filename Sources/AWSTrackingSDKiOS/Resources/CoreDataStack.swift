@@ -16,7 +16,6 @@ internal class CoreDataStack {
         idAttribute.name = "id"
         idAttribute.attributeType = .UUIDAttributeType
         idAttribute.isOptional = false
-        idAttribute.isIndexed = true
 
         let latitudeAttribute = NSAttributeDescription()
         latitudeAttribute.name = "latitude"
@@ -35,7 +34,6 @@ internal class CoreDataStack {
         timestampAttribute.attributeType = .dateAttributeType
 
         entity.properties = [idAttribute, latitudeAttribute, longitudeAttribute, uploadedAttribute, timestampAttribute]
-
         let container = NSPersistentContainer(name: "Model", managedObjectModel: model)
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {
