@@ -1,6 +1,29 @@
+# OSX
+#
 .DS_Store
+
+# Xcode
+#
+.build
+build/
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata
+*.xccheckout
+*.moved-aside
+DerivedData
+*.hmap
+*.ipa
+*.xcuserstate
 *.xcworkspacedata
-Tests/AWSTrackingSDKiOSTests/TestConfig.plist
-.swiftpm/xcode/package.xcworkspace/xcuserdata/zeeshansheikh.xcuserdatad/UserInterfaceState.xcuserstate
-.swiftpm/xcode/xcuserdata/zeeshansheikh.xcuserdatad/xcdebugger/Breakpoints_v2.xcbkptlist
-.swiftpm/xcode/xcuserdata/zeeshansheikh.xcuserdatad/xcschemes/xcschememanagement.plist
+/ios/Pods/
+
+# Idea
+#
+.idea
