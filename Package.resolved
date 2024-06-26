@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/makeen-project/amazon-location-mobile-auth-sdk-ios.git",
       "state" : {
-        "branch" : "ALMS-215_ObjC_Bridge",
-        "revision" : "d262666025e01dd0823f609ade95d2af71100e98"
+        "branch" : "main",
+        "revision" : "b22148d1c1ae2aa20e698833f8198fb226c81cae"
       }
     },
     {
