@@ -34,7 +34,7 @@ import AWSLocation
             deviceId = DeviceIdProvider.getDeviceID()!
         }
         
-        if provider.getCognitoProvider() != nil {
+        if provider.getCredentialsProvider() != nil {
             amazonLocationClient = AmazonLocationClient(locationCredentialsProvider: provider)
             locationUploadSerializer = LocationUploadSerializer(client: amazonLocationClient!, deviceId: deviceId, trackerName: self.trackerName)
         }

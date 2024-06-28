@@ -7,7 +7,7 @@ import AWSClientRuntime
     
     @objc func batchUpdateDevicePosition(request: BatchUpdateDevicePositionRequest) async throws -> BatchUpdateDevicePositionResponse? {
         do {
-            if locationProvider.getCognitoProvider() != nil {
+            if locationProvider.getCredentialsProvider() != nil {
                 if locationClient == nil {
                     try await initialiseLocationClient()
                 }
@@ -39,7 +39,7 @@ import AWSClientRuntime
     
     @objc func getDevicePositionHistory(request: GetDevicePositionHistoryRequest) async throws -> GetDevicePositionHistoryResponse? {
         do {
-            if locationProvider.getCognitoProvider() != nil {
+            if locationProvider.getCredentialsProvider() != nil {
                 if locationClient == nil {
                     try await initialiseLocationClient()
                 }
@@ -56,7 +56,7 @@ import AWSClientRuntime
     
     @objc func batchEvaluateGeofences(request: BatchEvaluateGeofencesRequest) async throws -> BatchEvaluateGeofencesResponse? {
         do {
-            if locationProvider.getCognitoProvider() != nil {
+            if locationProvider.getCredentialsProvider() != nil {
                 if locationClient == nil {
                     try await initialiseLocationClient()
                 }
