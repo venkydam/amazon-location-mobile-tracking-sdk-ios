@@ -3,10 +3,10 @@
     {
       "identity" : "amazon-location-mobile-auth-sdk-ios",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/makeen-project/amazon-location-mobile-auth-sdk-ios.git",
+      "location" : "https://github.com/aws-geospatial/amazon-location-mobile-auth-sdk-ios",
       "state" : {
-        "branch" : "ALMS-229_Custom_Provider",
-        "revision" : "a61721d8e386f55e2a70ed591ae703ec0db028f8"
+        "branch" : "0.2.1",
+        "revision" : "ab89a0b034931d1bb1e37637899b831d438488c3"
       }
     },
     {
