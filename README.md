@@ -11,7 +11,7 @@ These utilities help you track your location when making Amazon Location Service
 
 ## Functions
 
-  These are the functions available from this SDK:
+These are the functions available from this SDK:
 
   <table>
   <tr><th>Class</th><th>Function</th><th>Description</th></tr>
@@ -44,7 +44,6 @@ BackgroundTrackingMode has the following options:
 
 <tr><td>LocationTracker</td><td>getTrackerDeviceLocation(nextToken: String?, startTime: Date? = nil, endTime: Date? = nil, completion: @escaping (Result<GetLocationResponse, Error>) -> Void) </td><td>Retrieves the uploaded tracking locations for the user's device between start and end date & time</td></tr>
 
-
   <tr><td>LocationTrackerConfig</td><td>init()</td><td>This initializes the LocationTrackerConfig with default values</td></tr>
 
   <tr><td>LocationTrackerConfig</td><td>init(locationFilters: [LocationFilter]? = nil,
@@ -64,9 +63,8 @@ BackgroundTrackingMode has the following options:
 
 After installing the library, You will need to add one or both of the following descriptions in info.plist:
 
-
-* Privacy - Location When In Use Usage Description
-* Privacy - Location Always and When In Use Usage Description
+- Privacy - Location When In Use Usage Description
+- Privacy - Location Always and When In Use Usage Description
 
 Import the AuthHelper in your class:
 
@@ -77,7 +75,7 @@ import AmazonLocationiOSTrackingSDK
 
 Create AuthHelper and use it with the AWS SDK:
 
-``` swift
+```swift
 // Create an authentication helper using credentials from Cognito
 let authHelper = AuthHelper()
 let locationCredentialsProvider = authHelper.authenticateWithCognitoUserPool(identityPoolId: "My-Cognito-Identity-Pool-Id", region: "My-region") //example: us-east-1
@@ -94,9 +92,9 @@ locationTracker.setConfig(config: trackerConfig)
 
 You can use the location client to make calls to Amazon Location Service. Here are a few simple examples for tracking operations:
 
-``` swift
+```swift
 // Required in info.plist: Privacy - Location When In Use Usage Description
-do { 
+do {
     try locationTracker.startTracking()
 } catch TrackingLocationError.permissionDenied {
     // Handle permissionDenied by showing the alert message or open the app settings
@@ -127,11 +125,11 @@ locationTracker.stopBackgroundTracking()
 // To retrieve device's tracked locations from a tracker
 func getTrackingPoints(nextToken: String? = nil) {
     let startTime: Date = Date().addingTimeInterval(-86400) // Yesterday's day date & time
-    let endTime: Date = Date() 
+    let endTime: Date = Date()
     locationTracker.getTrackerDeviceLocation(nextToken: nextToken, startTime: startTime, endTime: endTime, completion: { [weak self] result in
         switch result {
         case .success(let response):
-            
+
             let positions = response.devicePositions
             // You can draw positions on map or use it further as per your requirement
 
@@ -159,9 +157,13 @@ You can [open an issue](https://github.com/aws-geospatial/amazon-location-mobile
 or [guidance](https://github.com/aws-geospatial/amazon-location-mobile-tracking-sdk-ios/issues/new?assignees=&labels=guidance%2C+needs-triage&template=---questions---help.md&title=).
 If you have a support plan with [AWS Support](https://aws.amazon.com/premiumsupport/), you can also create a new support case.
 
+Please make sure to check out the following resources before opening an issue:
+
+- Our [Changelog](CHANGELOG.md) for recent changes.
+
 ## Contributing
 
-We welcome community contributions and pull requests. See [CONTRIBUTING.md](https://github.com/aws-geospatial/amazon-location-mobile-tracking-sdk-ios/blob/master/CONTRIBUTING.md) for information on how to set up a development environment and submit code.
+We welcome community contributions and pull requests. See [CONTRIBUTING.md](CONTRIBUTING.md) for information on how to set up a development environment and submit code.
 
 ## License
 
