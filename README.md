@@ -16,7 +16,7 @@ These are the functions available from this SDK:
   <table>
   <tr><th>Class</th><th>Function</th><th>Description</th></tr>
 
-  <tr><td>LocationTracker</td><td>init(provider: LocationCredentialsProvider, trackerName: String, config: LocationTrackerConfig? = nil)</td><td>This is an initializer function to create a LocationTracker object. It requires LocationCredentialsProvide and trackerName and an optional LocationTrackingConfig. If config is not provided it will be initialized with default values</td></tr>
+  <tr><td>LocationTracker</td><td>init(identityPoolId: String, trackerName: String, config: LocationTrackerConfig? = nil)</td><td>This is an initializer function to create a LocationTracker object. It requires an identityPoolId and trackerName and an optional LocationTrackingConfig. If config is not provided it will be initialized with default values</td></tr>
 
 <tr><td>LocationTracker</td><td>setTrackerConfig(config: LocationTrackerConfig)</td><td>This sets Tracker's config to take effect at any point after initialization of location tracker</td></tr>
 
@@ -66,27 +66,24 @@ After installing the library, You will need to add one or both of the following 
 - Privacy - Location When In Use Usage Description
 - Privacy - Location Always and When In Use Usage Description
 
-Import the AuthHelper in your class:
+Import the Tracking SDK in your class:
 
 ```
-import AmazonLocationiOSAuthSDK
 import AmazonLocationiOSTrackingSDK
 ```
 
-Create AuthHelper and use it with the AWS SDK:
+Create `LocationTracker` and use it with the AWS SDK:
 
 ```swift
-// Create an authentication helper using credentials from Cognito
-let authHelper = AuthHelper()
-let locationCredentialsProvider = authHelper.authenticateWithCognitoUserPool(identityPoolId: "My-Cognito-Identity-Pool-Id", region: "My-region") //example: us-east-1
-let locationTracker = LocationTracker(provider: locationCredentialsProvider, trackerName: "My-tracker-name")
+// Create a LocationTracker using an Amazon Cognito Identity Pool ID
+let locationTracker = LocationTracker(identityPoolId: "<Cognito Identity Pool ID>", trackerName: "<My-tracker-name>")
 
 // Optionally you can set ClientConfig with your own values in either initialize or in a separate function
 let trackerConfig = LocationTrackerConfig(locationFilters: [TimeLocationFilter(), DistanceLocationFilter()],
             trackingDistanceInterval: 30,
             trackingTimeInterval: 30,
             logLevel: .debug)
-locationTracker = LocationTracker(provider: credentialsProvider, trackerName: "My-tracker-name",config: trackerConfig)
+locationTracker = LocationTracker(identityPoolId: "<Cognito Identity Pool ID>", trackerName: "<My-tracker-name>", config: trackerConfig)
 locationTracker.setConfig(config: trackerConfig)
 ```
 
@@ -104,18 +101,19 @@ do {
     try locationTracker.resumeTracking()
 } catch TrackingLocationError.permissionDenied {
     // Handle permissionDenied by showing the alert message or open the app settings
+}
 
 locationTracker.stopTracking()
 
 // Required in info.plist: Privacy - Location Always and When In Use Usage Description
 do {
-locationTracker.startBackgroundTracking(mode: .Active) // .Active, .BatterySaving, .None
+    locationTracker.startBackgroundTracking(mode: .Active) // .Active, .BatterySaving, .None
 } catch TrackingLocationError.permissionDenied {
     // Handle permissionDenied by showing the alert message or open the app settings
 }
 
 do {
-locationTracker.resumeBackgroundTracking(mode: .Active)
+    locationTracker.resumeBackgroundTracking(mode: .Active)
 } catch TrackingLocationError.permissionDenied {
     // Handle permissionDenied by showing the alert message or open the app settings
 }

@@ -1,30 +1,12 @@
 {
   "pins" : [
     {
-      "identity" : "amazon-location-mobile-auth-sdk-ios",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/aws-geospatial/amazon-location-mobile-auth-sdk-ios",
-      "state" : {
-        "revision" : "ef727557ea600f8096adde5e66ca2f7b141c99f7",
-        "version" : "0.3.1"
-      }
-    },
-    {
       "identity" : "aws-crt-swift",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/awslabs/aws-crt-swift",
       "state" : {
         "revision" : "7b42e0343f28b3451aab20840dc670abd12790bd",
         "version" : "0.36.0"
-      }
-    },
-    {
-      "identity" : "aws-sdk-swift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/awslabs/aws-sdk-swift",
-      "state" : {
-        "revision" : "4c084c0e616a660014479ea2e60e7a9533a52a05",
-        "version" : "1.0.17"
       }
     },
     {
@@ -41,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/smithy-lang/smithy-swift",
       "state" : {
-        "revision" : "274b526e1b329469043a950888ecbd44ed25dfc5",
-        "version" : "0.78.0"
+        "revision" : "c5242d4e06e721293ee91c7affd1d527912f596d",
+        "version" : "0.76.0"
       }
     },
     {

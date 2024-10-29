@@ -1,7 +1,7 @@
 import Foundation
 import CoreData
 
-@objc internal class LocationEntity: NSManagedObject {
+@objc public class LocationEntity: NSManagedObject {
 
 }
 

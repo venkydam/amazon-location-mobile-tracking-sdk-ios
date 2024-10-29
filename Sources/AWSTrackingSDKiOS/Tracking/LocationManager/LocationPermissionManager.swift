@@ -1,5 +1,4 @@
 import CoreLocation
-import UIKit
 
 @objc public enum BackgroundTrackingMode: Int {
     case Active = 0
