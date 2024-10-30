@@ -91,10 +91,8 @@ final class LocationTrackingTests: XCTestCase {
         
         let identityPoolID = config["identityPoolID"]!
         let trackerName = config["trackerName"]!
-        let authHelper = AuthHelper()
-        let authProvider = try await authHelper.authenticateWithCognitoIdentityPool(identityPoolId: identityPoolID)
 
-        let locationTracker = LocationTracker(provider: authProvider!, trackerName: trackerName)
+        let locationTracker = try await LocationTracker(identityPoolId: identityPoolID, trackerName: trackerName)
 
         XCTAssertNotNil(locationTracker, "Tracker should be successfully initialized")
         XCTAssertGreaterThanOrEqual(locationTracker.getTrackerConfig().trackingTimeInterval, 30, "Tracker time interval ")
@@ -107,17 +105,15 @@ final class LocationTrackingTests: XCTestCase {
         
         let identityPoolID = config["identityPoolID"]!
         let trackerName = config["trackerName"]!
-        let authHelper = AuthHelper()
-        let authProvider = try await authHelper.authenticateWithCognitoIdentityPool(identityPoolId: identityPoolID)
-        
-        let locationTracker = LocationTracker(provider: authProvider!, trackerName: trackerName)
+
+        let locationTracker = try await LocationTracker(identityPoolId: identityPoolID, trackerName: trackerName)
 
         try locationTracker.startTracking()
         XCTAssertEqual(locationTracker.isTrackingActive, true, "Tracking has started")
         
         let location = CLLocation(latitude: 49.2471, longitude: -123.063554)
         
-        _ = try await locationTracker.trackLocation(location: location)
+        locationTracker.trackLocation(location: location)
         
         locationTracker.stopTracking()
         XCTAssertEqual(locationTracker.isTrackingActive, false, "Tracking has stopped")
@@ -133,16 +129,14 @@ final class LocationTrackingTests: XCTestCase {
         
         let identityPoolID = config["identityPoolID"]!
         let trackerName = config["trackerName"]!
-        let authHelper = AuthHelper()
-        let authProvider = try await authHelper.authenticateWithCognitoIdentityPool(identityPoolId: identityPoolID)
-        
-        let locationTracker = LocationTracker(provider: authProvider!, trackerName: trackerName)
+
+        let locationTracker = try await LocationTracker(identityPoolId: identityPoolID, trackerName: trackerName)
         try locationTracker.startBackgroundTracking(mode: .None)
         XCTAssertEqual(locationTracker.isTrackingActive, true, "Tracking has started")
         
         let location = CLLocation(latitude: 49.2471, longitude: -123.063554)
         
-        _ = try await locationTracker.trackLocation(location: location)
+        locationTracker.trackLocation(location: location)
         
         locationTracker.stopBackgroundTracking()
         XCTAssertEqual(locationTracker.isTrackingActive, false, "Tracking has stopped")
@@ -158,10 +152,8 @@ final class LocationTrackingTests: XCTestCase {
         
         let identityPoolID = config["identityPoolID"]!
         let trackerName = config["trackerName"]!
-        let authHelper = AuthHelper()
-        let authProvider = try await authHelper.authenticateWithCognitoIdentityPool(identityPoolId: identityPoolID)
-        
-        let locationTracker = LocationTracker(provider: authProvider!, trackerName: trackerName)
+
+        let locationTracker = try await LocationTracker(identityPoolId: identityPoolID, trackerName: trackerName)
         let trackerConfig = LocationTrackerConfig(locationFilters: [TimeLocationFilter(), DistanceLocationFilter(), AccuracyLocationFilter()], trackingDistanceInterval: 30, trackingTimeInterval: 30, trackingAccuracyLevel: 1, uploadFrequency: 60, desiredAccuracy: kCLLocationAccuracyBest, activityType: CLActivityType.fitness, logLevel: .debug)
         locationTracker.setTrackerConfig(config: trackerConfig)
         let trackerConfig1 = locationTracker.getTrackerConfig()
@@ -178,10 +170,8 @@ final class LocationTrackingTests: XCTestCase {
         
         let identityPoolID = config["identityPoolID"]!
         let trackerName = config["trackerName"]!
-        let authHelper = AuthHelper()
-        let authProvider = try await authHelper.authenticateWithCognitoIdentityPool(identityPoolId: identityPoolID)
-        
-        let locationTracker = LocationTracker(provider: authProvider!, trackerName: trackerName)
+
+        let locationTracker = try await LocationTracker(identityPoolId: identityPoolID, trackerName: trackerName)
         let trackerConfig = LocationTrackerConfig()
         locationTracker.setTrackerConfig(config: trackerConfig)
         let trackerConfig1 = locationTracker.getTrackerConfig()
@@ -196,10 +186,8 @@ final class LocationTrackingTests: XCTestCase {
         
         let identityPoolID = config["identityPoolID"]!
         let trackerName = config["trackerName"]!
-        let authHelper = AuthHelper()
-        let authProvider = try await authHelper.authenticateWithCognitoIdentityPool(identityPoolId: identityPoolID)
-        
-        let locationTracker = LocationTracker(provider: authProvider!, trackerName: trackerName)
+
+        let locationTracker = try await LocationTracker(identityPoolId: identityPoolID, trackerName: trackerName)
         var location = CLLocation(latitude: 49.246559, longitude: -123.063554)
         let currentLocationEntity = locationDatabase.save(location: location)
         currentLocationEntity?.timestamp = Date()
@@ -220,10 +208,8 @@ final class LocationTrackingTests: XCTestCase {
         
         let identityPoolID = config["identityPoolID"]!
         let trackerName = config["trackerName"]!
-        let authHelper = AuthHelper()
-        let authProvider = try await authHelper.authenticateWithCognitoIdentityPool(identityPoolId: identityPoolID)
-        
-        let locationTracker = LocationTracker(provider: authProvider!, trackerName: trackerName)
+
+        let locationTracker = try await LocationTracker(identityPoolId: identityPoolID, trackerName: trackerName)
         var location = CLLocation(latitude: 49.2471, longitude: -123.063554)
         let currentLocationEntity = locationDatabase.save(location: location)
         currentLocationEntity?.timestamp = Date()
@@ -244,10 +230,8 @@ final class LocationTrackingTests: XCTestCase {
         
         let identityPoolID = config["identityPoolID"]!
         let trackerName = config["trackerName"]!
-        let authHelper = AuthHelper()
-        let authProvider = try await authHelper.authenticateWithCognitoIdentityPool(identityPoolId: identityPoolID)
-        
-        let locationTracker = LocationTracker(provider: authProvider!, trackerName: trackerName)
+
+        let locationTracker = try await LocationTracker(identityPoolId: identityPoolID, trackerName: trackerName)
         var location = CLLocation(latitude: 49.2471, longitude: -123.063554)
         let currentLocationEntity = locationDatabase.save(location: location)
         currentLocationEntity?.timestamp = Date()
@@ -271,8 +255,7 @@ final class LocationTrackingTests: XCTestCase {
         let config = readTestConfig()
         let identityPoolId = config["identityPoolID"]!
         let trackerName = config["trackerName"]!
-        let cognitoProvider = try await AuthHelper().authenticateWithCognitoIdentityPool(identityPoolId: identityPoolId)
-        let tracker = LocationTracker(provider: cognitoProvider!, trackerName: trackerName)
+        let tracker = try await LocationTracker(identityPoolId: identityPoolId, trackerName: trackerName)
         let startTime: Date = Date().addingTimeInterval(-86400)
         let endTime: Date = Date()
         let result = try await tracker.getTrackerDeviceLocation(nextToken: nil, startTime: startTime, endTime: endTime)
@@ -289,27 +272,7 @@ final class LocationTrackingTests: XCTestCase {
         XCTAssertEqual(locationProvider.locationPermissionManager!.hasLocationPermissionDenied(), false)
         XCTAssertEqual(locationProvider.locationPermissionManager!.checkPermission() , .notDetermined)
     }
-    
-    func testBatchUpdateDevicePosition() async throws {
-        let config = readTestConfig()
-        let identityPoolId = config["identityPoolID"]!
-        let region = config["region"]!
-        let trackerName = config["trackerName"]!
-        
-        let authHelper = AuthHelper()
-        _ = try? await authHelper.authenticateWithCognitoIdentityPool(identityPoolId: identityPoolId, region: region)
-        
-        let amazonClient = authHelper.getLocationClient()
-        
-        let update = DevicePositionUpdate(accuracy: DevicePositionalAccuracy.init(horizontal: 1), deviceId: "DeviceID", position: [-71.985564, 41.758023], positionProperties: nil, sampleTime: Date())
-        let updates = [update]
-        let request = BatchUpdateDevicePositionRequest(trackerName: trackerName, updates: updates)
-        
-        let positionUpdateResponse = try? await amazonClient!.batchUpdateDevicePosition(request: request)
-        
-        XCTAssertEqual(positionUpdateResponse?.errors?.count, 0, "Device Position updated successfully")
-    }
-    
+
     private func getCurrentDate() -> String {
         let currentDate = Date()
 
