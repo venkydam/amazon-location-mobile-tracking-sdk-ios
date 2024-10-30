@@ -76,14 +76,14 @@ Create `LocationTracker` and use it with the AWS SDK:
 
 ```swift
 // Create a LocationTracker using an Amazon Cognito Identity Pool ID
-let locationTracker = LocationTracker(identityPoolId: "<Cognito Identity Pool ID>", trackerName: "<My-tracker-name>")
+let locationTracker = try await LocationTracker(identityPoolId: "<Cognito Identity Pool ID>", trackerName: "<My-tracker-name>")
 
 // Optionally you can set ClientConfig with your own values in either initialize or in a separate function
 let trackerConfig = LocationTrackerConfig(locationFilters: [TimeLocationFilter(), DistanceLocationFilter()],
             trackingDistanceInterval: 30,
             trackingTimeInterval: 30,
             logLevel: .debug)
-locationTracker = LocationTracker(identityPoolId: "<Cognito Identity Pool ID>", trackerName: "<My-tracker-name>", config: trackerConfig)
+let locationTracker = try await LocationTracker(identityPoolId: "<Cognito Identity Pool ID>", trackerName: "<My-tracker-name>", config: trackerConfig)
 locationTracker.setConfig(config: trackerConfig)
 ```
 
