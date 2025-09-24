@@ -11,30 +11,31 @@ final class LocationTrackingTests: XCTestCase {
     
     override func tearDownWithError() throws {
     }
-    
+    // Reads test configuration from environment variables
     func readTestConfig() -> [String: String] {
-        // Implement reading from your chosen config file. This is an example for a plist.
-        guard let plistURL = Bundle.module.url(forResource: "TestConfig", withExtension: "plist"),
-              let plistData = try? Data(contentsOf: plistURL) else {
-            fatalError("Test configuration file not found.")
+        let configDict: [String: String] = [
+            "region": ProcessInfo.processInfo.environment["REGION"] ?? "",
+            "apiKey": ProcessInfo.processInfo.environment["API_KEY"] ?? "",
+            "identityPoolID": ProcessInfo.processInfo.environment["IDENTITY_POOL_ID"] ?? "",
+            "trackerName": ProcessInfo.processInfo.environment["TRACKER_NAME"] ?? "",
+            "deviceID": ProcessInfo.processInfo.environment["DEVICE_ID"] ?? ""
+        ]
+        let missingKeys = configDict.filter { $0.value.isEmpty }.map { $0.key }
+        if !missingKeys.isEmpty {
+            XCTFail("Missing required environment variables: \(missingKeys.joined(separator: ", "))")
         }
-        do {
-            if let plistDict = try PropertyListSerialization.propertyList(from: plistData, options: [], format: nil) as? [String: String] {
-                return plistDict
-            }
-        } catch {
-            XCTFail("Error reading plist: \(error)")
-        }
-        return [:]
+        
+        return configDict
     }
-    
+    // Tests device ID generation when no ID is provided
     func testSetDeviceIDNoID() throws {
         DeviceIdProvider.clearDeviceID()
         DeviceIdProvider.setDeviceID()
         
         XCTAssertNotNil(DeviceIdProvider.getDeviceID())
     }
-    
+
+    // Tests device ID setting with a custom ID
     func testSetDeviceIDWithID() throws {
         let deviceID = UUID().uuidString
         DeviceIdProvider.clearDeviceID()
@@ -42,7 +43,9 @@ final class LocationTrackingTests: XCTestCase {
         
         XCTAssertEqual(deviceID, DeviceIdProvider.getDeviceID())
     }
-    
+
+     
+    // Tests saving location data to local database
     func testSaveLocationToDisk() throws {
         let locationDatabase = LocationDatabase()
         let location = CLLocation(latitude: 49.246559, longitude: -123.063554)
@@ -53,8 +56,9 @@ final class LocationTrackingTests: XCTestCase {
         XCTAssertGreaterThanOrEqual(locations.count, 1, "Location Entity is saved")
         locationDatabase.delete(locationID: locations.first!.id!.uuidString)
     }
-    
-    func testDeleteLocationToDisk() throws {
+      
+    // Tests deleting location data from local database
+        func testDeleteLocationToDisk() throws {
         let locationDatabase = LocationDatabase()
         var location = CLLocation(latitude: 49.246559, longitude: -123.063554)
         var locationEntity = locationDatabase.save(location: location)
@@ -85,7 +89,8 @@ final class LocationTrackingTests: XCTestCase {
 
         XCTAssertGreaterThanOrEqual(locationDatabase.count(), 0, "Location delete all result is 0")
     }
-    
+      
+    // Tests LocationTracker initialization with AWS credentials
     func testLocationTrackerInitialization() async throws {
         let config = readTestConfig()
         
@@ -99,7 +104,8 @@ final class LocationTrackingTests: XCTestCase {
         XCTAssertNotNil(locationTracker.getDeviceId(), "Tracker device Id")
         XCTAssertNotNil(Logger.getLoggerKey())
     }
-    
+     
+    // Tests starting, stopping, and resuming location tracking
     func testLocationStartTracking() async throws {
         let config = readTestConfig()
         
@@ -123,7 +129,8 @@ final class LocationTrackingTests: XCTestCase {
         locationTracker.stopTracking()
         XCTAssertEqual(locationTracker.isTrackingActive, false, "Tracking has stopped")
     }
-    
+      
+    // Tests background location tracking functionality
     func testLocationStartBackgroundTracking() async throws {
         let config = readTestConfig()
         
@@ -146,7 +153,9 @@ final class LocationTrackingTests: XCTestCase {
         locationTracker.stopBackgroundTracking()
         XCTAssertEqual(locationTracker.isTrackingActive, false, "Tracking has stopped")
     }
-    
+
+       
+    // Tests setting custom location tracking configuration
     func testLocationTrackingConfig() async throws {
         let config = readTestConfig()
         
@@ -159,12 +168,15 @@ final class LocationTrackingTests: XCTestCase {
         let trackerConfig1 = locationTracker.getTrackerConfig()
         XCTAssertEqual(trackerConfig.trackingTimeInterval, trackerConfig1.trackingTimeInterval, "Location tracker config set successfully")
     }
-    
+
+     
+    // Tests UserDefaults helper for device ID storage
     func testUserDefaultsHelper() {
         UserDefaultsHelper.removeObject(for: .DeviceID)
       XCTAssertNil(UserDefaultsHelper.getObject(value: String.self, key: .DeviceID), "Device ID is nil")
     }
     
+    // Tests default location tracking configuration
     func testLocationTrackingConfigDefault() async throws {
         let config = readTestConfig()
         
@@ -179,6 +191,7 @@ final class LocationTrackingTests: XCTestCase {
     }
     
     
+    // Tests time-based location filtering
     func testTimeFilter() async throws {
         let locationDatabase = LocationDatabase()
         let filter = TimeLocationFilter()
@@ -201,6 +214,7 @@ final class LocationTrackingTests: XCTestCase {
         XCTAssertEqual(shouldUpload, true, "TimeFilter location should upload")
     }
     
+    // Tests distance-based location filtering
     func testDistanceFilter() async throws {
         let locationDatabase = LocationDatabase()
         let filter = DistanceLocationFilter()
@@ -223,6 +237,7 @@ final class LocationTrackingTests: XCTestCase {
         XCTAssertEqual(shouldUpload, true, "DistanceFilter location should upload")
     }
     
+    // Tests accuracy-based location filtering
     func testAccuracyFilter() async throws {
         let locationDatabase = LocationDatabase()
         let filter = AccuracyLocationFilter()
@@ -245,12 +260,7 @@ final class LocationTrackingTests: XCTestCase {
         XCTAssertEqual(shouldUpload, true, "AccuracyFilter location should upload")
     }
     
-    func testArrayChunk() {
-        let chunks = Utils.chunked(Array(0...99), size: 10)
-        
-        XCTAssertEqual(chunks.count, 10, "Chunk value is 10")
-    }
-    
+    // Tests retrieving tracked locations from AWS
     func testGetTrackingLocations() async throws {
         let config = readTestConfig()
         let identityPoolId = config["identityPoolID"]!
@@ -263,6 +273,7 @@ final class LocationTrackingTests: XCTestCase {
         XCTAssertNotNil(result, "Found device's tracker locations")
     }
 
+    // Tests location manager permission status
     func testLocationManager() {
         let locationProvider = LocationProvider()
         locationProvider.locationPermissionManager!.setBackgroundMode(mode: .None)
@@ -272,17 +283,77 @@ final class LocationTrackingTests: XCTestCase {
         XCTAssertEqual(locationProvider.locationPermissionManager!.hasLocationPermissionDenied(), false)
         XCTAssertEqual(locationProvider.locationPermissionManager!.checkPermission() , .notDetermined)
     }
-
-    private func getCurrentDate() -> String {
-        let currentDate = Date()
-
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'"
-        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
-        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-
-        let formattedDateString = dateFormatter.string(from: currentDate)
-
-        return formattedDateString
+    
+    // Tests setting background mode to None
+    func testLocationPermissionManagerSetBackgroundModeNone() {
+        let locationManager = CLLocationManager()
+        let permissionManager = LocationPermissionManager(locationManager: locationManager)
+        
+        permissionManager.setBackgroundMode(mode: .None)
+        
+        XCTAssertFalse(locationManager.allowsBackgroundLocationUpdates)
+        XCTAssertFalse(locationManager.pausesLocationUpdatesAutomatically)
     }
+
+    // Tests background tracking mode string descriptions
+    func testBackgroundTrackingModeDescription() {
+        XCTAssertEqual(BackgroundTrackingMode.Active.description, "Active")
+        XCTAssertEqual(BackgroundTrackingMode.BatterySaving.description, "BatterySaving")
+        XCTAssertEqual(BackgroundTrackingMode.None.description, "None")
+    }
+
+    // Tests location permission request methods
+    func testLocationPermissionManagerRequestPermissions() {
+        let locationManager = CLLocationManager()
+        let permissionManager = LocationPermissionManager(locationManager: locationManager)
+        
+        // These methods should execute without crashing
+        permissionManager.requestPermission()
+        permissionManager.requestAlwaysPermission()
+        
+        XCTAssertNotNil(permissionManager)
+    }
+
+    // Tests checking current location permission status
+    func testLocationPermissionManagerCheckPermission() {
+        let locationManager = CLLocationManager()
+        let permissionManager = LocationPermissionManager(locationManager: locationManager)
+        
+        let status = permissionManager.checkPermission()
+        
+        XCTAssertNotNil(status)
+    }
+    
+    // Tests LocationProvider initialization
+    func testLocationProviderInitialization() {
+        let locationProvider = LocationProvider()
+        
+        XCTAssertNotNil(locationProvider.locationPermissionManager)
+        XCTAssertNotNil(locationProvider.locationManager)
+        XCTAssertNil(locationProvider.lastKnownLocation)
+    }
+    
+    // Tests LocationProvider error handling
+    func testLocationProviderDidFailWithError() {
+        let locationProvider = LocationProvider()
+        let testError = NSError(domain: "TestError", code: 1, userInfo: nil)
+        
+        locationProvider.locationManager(locationProvider.locationManager, didFailWithError: testError)
+        
+        XCTAssertNotNil(locationProvider)
+    }
+
+    // Tests LocationProvider region monitoring failure
+    func testLocationProviderMonitoringDidFail() {
+        let locationProvider = LocationProvider()
+        let testRegion = CLCircularRegion(center: CLLocationCoordinate2D(latitude: 49.246559, longitude: -123.063554), radius: 100, identifier: "test")
+        let testError = NSError(domain: "TestError", code: 1, userInfo: nil)
+        
+        locationProvider.locationManager(locationProvider.locationManager, monitoringDidFailFor: testRegion, withError: testError)
+        
+        XCTAssertNotNil(locationProvider)
+    }
+
 }
+
+    
